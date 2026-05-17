@@ -171,3 +171,4 @@ Tests use `renderWithProviders` from `src/test-utils.tsx` which wraps components
 - Screens are default-exported and placed in `src/screens/{feature}/`
 - Redux slices follow: store-key → slice → root-reducer registration
 - React Query follows: query-key → service → hook → query-hooks export
+# mobile-claw
