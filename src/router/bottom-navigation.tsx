@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Dimensions, Platform, Text, TouchableOpacity, View} from 'react-native';
+import {Dimensions, Platform, Pressable, Text, View} from 'react-native';
 
 import {useTranslation} from 'react-i18next';
 
@@ -11,6 +11,7 @@ import {TAB_HEIGHT} from '@app/constan/dimensions';
 import {useTheme} from '@app/themes';
 import {MainHomeScreen} from '@screens/home/main-home';
 import KnowledgeScreen from '@screens/knowledge/knowledge-screen';
+import NotificationScreen from '@screens/notification/notification-screen';
 import ProfileScreen from '@screens/profile/profile-screen';
 
 import {IBottomTabScreen} from './route-name';
@@ -22,6 +23,7 @@ const TAB_ICONS: Record<keyof IBottomTabScreen, string> = {
   home: 'home',
   knowledge: 'book-open',
   profile: 'user',
+  notification: 'bell',
 };
 
 type TabIconProps = {
@@ -43,6 +45,7 @@ export const BottomTabScreen = () => (
   <Tab.Navigator screenOptions={{headerShown: false}} tabBar={renderBottomTab}>
     <Tab.Screen name="home" component={MainHomeScreen} />
     <Tab.Screen name="knowledge" component={KnowledgeScreen} />
+    <Tab.Screen name="notification" component={NotificationScreen} />
     <Tab.Screen name="profile" component={ProfileScreen} />
   </Tab.Navigator>
 );
@@ -72,8 +75,7 @@ const BottomTab = (props: any) => {
           ...Platform.select({
             android: {height: TAB_HEIGHT},
             ios: {
-              height: TAB_HEIGHT + 16,
-              paddingBottom: 24,
+              height: TAB_HEIGHT,
             },
           }),
         }}
@@ -95,8 +97,7 @@ const BottomTab = (props: any) => {
           };
 
           return (
-            <TouchableOpacity
-              activeOpacity={1}
+            <Pressable
               key={index}
               accessibilityRole="button"
               accessibilityState={isFocused ? {selected: true} : {}}
@@ -128,7 +129,7 @@ const BottomTab = (props: any) => {
               >
                 {t(route.name)}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           );
         })}
       </View>

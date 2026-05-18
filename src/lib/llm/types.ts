@@ -13,7 +13,7 @@ export interface LoadModelOptions {
 }
 
 export interface GenerateOptions {
-  /** Max tokens to generate */
+  /** Max tokens to generate (default: 256) */
   maxTokens?: number;
   /** Temperature 0.0–1.0 */
   temperature?: number;
@@ -22,8 +22,18 @@ export interface GenerateOptions {
   /** Called with each streamed token */
   onToken?: (token: string) => void;
   /**
+   * @deprecated Pass ragChunks instead.
    * Override the prompt actually sent to the LLM (e.g. a RAG-augmented prompt).
-   * The user bubble always shows the original userText; this is used only for LLM completion.
    */
   llmPrompt?: string;
+  /**
+   * Pre-retrieved RAG chunk texts to inject into the prompt via the prompt builder.
+   * Takes precedence over llmPrompt when both are provided.
+   */
+  ragChunks?: string[];
+  /**
+   * SQLite room ID used to look up the Layer-2 conversation summary and
+   * track the per-room message count for auto-summarization.
+   */
+  roomId?: string;
 }

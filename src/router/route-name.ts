@@ -10,6 +10,7 @@ export const Route = {
   knowledge: 'knowledge',
   addKnowledge: 'addKnowledge',
   profile: 'profile',
+  notification: 'notification',
 } as const;
 
 export interface IBottomTabScreen {
@@ -17,6 +18,7 @@ export interface IBottomTabScreen {
   home: undefined;
   knowledge: undefined;
   profile: undefined;
+  notification: undefined;
 }
 
 export type StackScreens = {

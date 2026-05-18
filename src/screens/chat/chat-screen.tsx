@@ -1,13 +1,15 @@
-import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
 import {
+  ActivityIndicator,
   Alert,
   Animated,
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
+  StyleSheet,
   TextInput as RNTextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
 
@@ -20,11 +22,12 @@ import {useAppDispatch, useAppSelector} from '@app/hooks/redux';
 import {Box, Text, useTheme} from '@app/themes';
 import {IconButton} from '@components/button/icon-button';
 import {Container} from '@components/container';
+import {ModelPickerSheet} from '@components/model-picker-sheet';
 import {
   createRoom,
   deleteMessagesByRoom,
   deleteRoom,
-  getMessagesByRoom,
+  getMessagesByRoomPaginated,
   getRoomById,
   saveMessage,
   updateRoomTitle,
@@ -32,12 +35,36 @@ import {
 import {LlamaManager} from '@lib/llm';
 import {useChat, useLoadModel} from '@lib/llm/hooks';
 import {useRag} from '@lib/rag/hooks';
-import {buildRagPrompt} from '@lib/rag/retriever';
 import {llm_action, LlmMessage} from '@redux-store/slice/llm';
+import {memory_action} from '@redux-store/slice/memory';
 import {store} from '@redux-store/store';
 import {RouteStackNavigation} from '@router/route-name';
 
-import {ModelPickerSheet} from '../../components/model-picker-sheet';
+const GENERATION_TIMEOUT_MS = 5 * 60 * 1000;
+const PAGE_SIZE = 5;
+
+const styles = StyleSheet.create({
+  typingRow: {flexDirection: 'row', alignItems: 'center', paddingVertical: 6, paddingHorizontal: 2},
+  typingDot: {width: 8, height: 8, borderRadius: 4, marginHorizontal: 3},
+  sendButton: {width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center'},
+  sendArrow: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 8,
+    borderBottomWidth: 8,
+    borderLeftWidth: 14,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    marginLeft: 3,
+  },
+  textInput: {
+    fontSize: 14,
+    lineHeight: 20,
+    maxHeight: 120,
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+});
 
 // ---------------------------------------------------------------------------
 // TypingIndicator — three bouncing dots shown while the model starts replying
@@ -61,19 +88,9 @@ const TypingIndicator: React.FC<{color: string}> = React.memo(({color}) => {
   }, [anims]);
 
   return (
-    <View style={{flexDirection: 'row', alignItems: 'center', paddingVertical: 6, paddingHorizontal: 2}}>
+    <View style={styles.typingRow}>
       {anims.map((anim, i) => (
-        <Animated.View
-          key={i}
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: color,
-            marginHorizontal: 3,
-            opacity: anim,
-          }}
-        />
+        <Animated.View key={i} style={[styles.typingDot, {backgroundColor: color, opacity: anim}]} />
       ))}
     </View>
   );
@@ -82,13 +99,88 @@ const TypingIndicator: React.FC<{color: string}> = React.memo(({color}) => {
 // ---------------------------------------------------------------------------
 // StreamingText — fades in when the bubble first appears, then streams normally
 // ---------------------------------------------------------------------------
-const StreamingText: React.FC<{content: string; textStyle: object}> = React.memo(({content, textStyle}) => {
+type AssistantTextStyle = {color: string; fontSize: number; lineHeight: number};
+
+const StreamingText: React.FC<{content: string; textStyle: AssistantTextStyle}> = React.memo(({content, textStyle}) => {
   const opacity = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     Animated.timing(opacity, {toValue: 1, duration: 250, useNativeDriver: true}).start();
   }, [opacity]);
   return <Animated.Text style={[textStyle, {opacity}]}>{content}</Animated.Text>;
 });
+
+// ---------------------------------------------------------------------------
+
+const ChatMessageRow = React.memo(
+  ({
+    item,
+    isStreaming,
+    textColor,
+    codeBg,
+    typingColor,
+  }: {
+    item: LlmMessage;
+    isStreaming: boolean;
+    textColor: string;
+    codeBg: string;
+    typingColor: string;
+  }) => {
+    const assistantTextStyle = useMemo<AssistantTextStyle>(
+      () => ({color: textColor, fontSize: 14, lineHeight: 20}),
+      [textColor],
+    );
+    const markdownStyle = useMemo(
+      () => ({
+        body: assistantTextStyle,
+        code_inline: {backgroundColor: codeBg, borderRadius: 4, paddingHorizontal: 4},
+        fence: {backgroundColor: codeBg, borderRadius: 8, padding: 8},
+      }),
+      [assistantTextStyle, codeBg],
+    );
+
+    return (
+      <Box
+        alignSelf={item.role === 'user' ? 'flex-end' : 'flex-start'}
+        maxWidth="85%"
+        marginBottom="sm"
+        borderRadius="md"
+        paddingHorizontal="md"
+        paddingVertical="xs"
+        backgroundColor={item.role === 'user' ? 'primary' : 'grey_light'}
+      >
+        {item.role === 'user' ? (
+          <Text variant="body_regular" color="white">
+            {item.content}
+          </Text>
+        ) : isStreaming && !item.content ? (
+          <TypingIndicator color={typingColor} />
+        ) : isStreaming ? (
+          <StreamingText content={item.content} textStyle={assistantTextStyle} />
+        ) : (
+          <Markdown style={markdownStyle}>{item.content || '…'}</Markdown>
+        )}
+        <Text
+          mb={item.role === 'user' ? undefined : 'sm'}
+          mt={'xs'}
+          color={item.role === 'user' ? 'white' : 'grey_dark'}
+          variant={'body_helper_regular'}
+          textAlign={item.role === 'user' ? 'left' : 'right'}
+        >
+          {item.createdAt ? formatChatTime(new Date(item.createdAt)) : ''}
+        </Text>
+      </Box>
+    );
+  },
+  (prev, next) =>
+    prev.item.id === next.item.id &&
+    prev.item.role === next.item.role &&
+    prev.item.content === next.item.content &&
+    prev.item.createdAt === next.item.createdAt &&
+    prev.isStreaming === next.isStreaming &&
+    prev.textColor === next.textColor &&
+    prev.codeBg === next.codeBg &&
+    prev.typingColor === next.typingColor,
+);
 
 // ---------------------------------------------------------------------------
 
@@ -101,7 +193,7 @@ const ChatScreen: React.FC = () => {
   const headerHeight = useHeaderHeight();
   const route = useRoute<ChatRouteProp>();
   const {messages, isGenerating, isModelLoaded, sendMessage, clearChat} = useChat();
-  const {loadModel} = useLoadModel();
+  const {loadModel, progress} = useLoadModel();
   const {retrieveChunks} = useRag();
   const isEmbedReady = useAppSelector(state => state.RagReducer.isEmbedModelLoaded);
   const documentCount = useAppSelector(state => state.RagReducer.documentCount);
@@ -109,7 +201,14 @@ const ChatScreen: React.FC = () => {
   const [input, setInput] = useState('');
   const [showPicker, setShowPicker] = useState(false);
   const [roomTitle, setRoomTitle] = useState('New Chat');
-  const flatListRef = useRef<FlatList>(null);
+  const [hasMoreHistory, setHasMoreHistory] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const oldestCreatedAtRef = useRef<number | undefined>(undefined);
+  const loadedCountRef = useRef(0);
+  const isPrependingRef = useRef(false);
+  const flatListRef = useRef<FlatList<LlmMessage>>(null);
+  const prevMessageCountRef = useRef(0);
+  const isModelLoading = progress > 0 && progress < 100;
 
   // SQLite room tracking
   const roomIdRef = useRef<string | null>(null);
@@ -123,7 +222,7 @@ const ChatScreen: React.FC = () => {
       isFirstExchangeRef.current = false;
       const room = getRoomById(roomId);
       if (room) setRoomTitle(room.title);
-      const history = getMessagesByRoom(roomId);
+      const history = getMessagesByRoomPaginated(roomId, PAGE_SIZE);
       const reduxMsgs: LlmMessage[] = history.map(m => ({
         id: m.id,
         role: m.role,
@@ -131,10 +230,15 @@ const ChatScreen: React.FC = () => {
         createdAt: m.createdAt,
       }));
       dispatch(llm_action.setMessages(reduxMsgs));
+      oldestCreatedAtRef.current = history[0]?.createdAt;
+      loadedCountRef.current = history.length;
+      setHasMoreHistory(history.length >= PAGE_SIZE);
     } else {
       dispatch(llm_action.clearMessages());
       roomIdRef.current = null;
       isFirstExchangeRef.current = true;
+      loadedCountRef.current = 0;
+      setHasMoreHistory(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -147,7 +251,8 @@ const ChatScreen: React.FC = () => {
       const roomId = roomIdRef.current;
       if (!roomId) return;
       if (generatingRoomId === roomId) return;
-      const history = getMessagesByRoom(roomId);
+      const countToReload = Math.max(loadedCountRef.current, PAGE_SIZE);
+      const history = getMessagesByRoomPaginated(roomId, countToReload);
       const reduxMsgs: LlmMessage[] = history.map(m => ({
         id: m.id,
         role: m.role,
@@ -155,13 +260,68 @@ const ChatScreen: React.FC = () => {
         createdAt: m.createdAt,
       }));
       dispatch(llm_action.setMessages(reduxMsgs));
+      oldestCreatedAtRef.current = history[0]?.createdAt;
+      loadedCountRef.current = history.length;
+      setHasMoreHistory(history.length >= countToReload);
     }, [dispatch, generatingRoomId]),
+  );
+
+  // Keep loadedCountRef in sync when new messages are added during a session
+  // so useFocusEffect reloads the correct count when the screen regains focus.
+  useEffect(() => {
+    if (messages.length > loadedCountRef.current) {
+      loadedCountRef.current = messages.length;
+    }
+  }, [messages.length]);
+
+  const loadMoreHistory = useCallback(async () => {
+    const roomId = roomIdRef.current;
+    if (!roomId || isLoadingMore || !hasMoreHistory) return;
+    setIsLoadingMore(true);
+    const older = getMessagesByRoomPaginated(roomId, PAGE_SIZE, oldestCreatedAtRef.current);
+    if (older.length > 0) {
+      const reduxMsgs: LlmMessage[] = older.map(m => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        createdAt: m.createdAt,
+      }));
+      isPrependingRef.current = true;
+      dispatch(llm_action.prependMessages(reduxMsgs));
+      oldestCreatedAtRef.current = older[0]?.createdAt;
+      loadedCountRef.current += older.length;
+      setHasMoreHistory(older.length >= PAGE_SIZE);
+    } else {
+      setHasMoreHistory(false);
+    }
+    setIsLoadingMore(false);
+  }, [dispatch, hasMoreHistory, isLoadingMore]);
+
+  const handleScroll = useCallback(
+    ({nativeEvent}: {nativeEvent: {contentOffset: {y: number}}}) => {
+      if (nativeEvent.contentOffset.y < 80) {
+        loadMoreHistory();
+      }
+    },
+    [loadMoreHistory],
   );
 
   /** Fire-and-forget: ask the model for a short chat title and persist it */
   const generateRoomTitle = useCallback((roomId: string, firstUserMessage: string) => {
     const context = LlamaManager.getContext();
     if (!context) return;
+    // Guard against concurrent context.completion() calls — llama.cpp is not thread-safe.
+    // sendMessage sets this flag; if it's still busy (e.g. user sent a follow-up quickly),
+    // skip LLM title generation and fall back to using the first few words instead.
+    if (LlamaManager.isBusy()) {
+      const fallbackTitle = firstUserMessage.trim().split(/\s+/).slice(0, 6).join(' ').slice(0, 60);
+      if (fallbackTitle) {
+        updateRoomTitle(roomId, fallbackTitle);
+        setRoomTitle(fallbackTitle);
+      }
+      return;
+    }
+    LlamaManager.setBusy(true);
     context
       .completion({
         messages: [
@@ -177,6 +337,18 @@ const ChatScreen: React.FC = () => {
         ],
         n_predict: 20,
         temperature: 0.5,
+        enable_thinking: false,
+        stop: [
+          '</s>',
+          '<|end|>',
+          '<|eot_id|>',
+          '<|end_of_text|>',
+          '<|im_end|>',
+          '<|EOT|>',
+          '<|END_OF_TURN_TOKEN|>',
+          '<|end_of_turn|>',
+          '<|endoftext|>',
+        ],
       })
       .then((result: any) => {
         const title = (result?.text ?? '')
@@ -188,7 +360,10 @@ const ChatScreen: React.FC = () => {
           setRoomTitle(title);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        LlamaManager.setBusy(false);
+      });
   }, []);
 
   const handleSend = useCallback(async () => {
@@ -207,24 +382,22 @@ const ChatScreen: React.FC = () => {
     const isFirst = isFirstExchangeRef.current;
     isFirstExchangeRef.current = false;
 
-    let llmPrompt: string | undefined;
+    let ragChunks: string[] | undefined;
     if (isEmbedReady && documentCount > 0) {
       try {
-        const chunks = await retrieveChunks(text, {topK: 4, minScore: 0.3});
-        if (chunks.length > 0) {
-          llmPrompt = buildRagPrompt(text, chunks);
-          console.log('[RAG] augmented prompt built, length:', llmPrompt.length);
-        } else {
-          console.log('[RAG] no relevant chunks — sending plain message');
+        // Retrieve top 3 chunks via embedding search + keyword rerank
+        const retrieved = await retrieveChunks(text, {topK: 3, minScore: 0.3});
+        if (retrieved.length > 0) {
+          ragChunks = retrieved.map(r => r.chunk.text);
         }
-      } catch (e) {
-        console.warn('[RAG] lookup failed:', (e as Error)?.message ?? e);
+      } catch {
+        ragChunks = undefined;
       }
     }
 
     saveMessage(roomId, 'user', text);
     dispatch(llm_action.setGeneratingRoomId(roomId));
-    await sendMessage(text, {llmPrompt});
+    await sendMessage(text, {roomId, ragChunks});
 
     // Save the final assistant reply to SQLite now that generation is complete.
     const allMsgs = store.getState().LlmReducer.messages;
@@ -264,7 +437,12 @@ const ChatScreen: React.FC = () => {
           if (roomId) {
             deleteMessagesByRoom(roomId);
             deleteRoom(roomId);
+            dispatch(memory_action.deleteRoomMemory(roomId));
           }
+          // Clear the KV cache so the next conversation starts clean.
+          // Without this, the model may continue using cached context from
+          // the deleted conversation, causing contaminated responses.
+          LlamaManager.getContext()?.clearCache(false);
           clearChat();
           roomIdRef.current = null;
           isFirstExchangeRef.current = true;
@@ -272,45 +450,49 @@ const ChatScreen: React.FC = () => {
         },
       },
     ]);
-  }, [clearChat, navigation, isGenerating]);
+  }, [clearChat, dispatch, navigation, isGenerating]);
 
-  const assistantTextStyle = {
-    color: theme.colors.black,
-    fontSize: 14,
-    lineHeight: 20,
-  };
+  useEffect(() => {
+    if (!isGenerating) return;
 
-  const renderAssistantContent = useCallback(
-    (item: LlmMessage) => {
-      const isItemStreaming = isGenerating && messages.length > 0 && item.id === messages[messages.length - 1]?.id;
-      if (isItemStreaming && !item.content) {
-        return <TypingIndicator color={theme.colors.grey} />;
-      }
-      if (isItemStreaming) {
-        return <StreamingText content={item.content} textStyle={assistantTextStyle} />;
-      }
-      return (
-        <Markdown
-          style={{
-            body: assistantTextStyle,
-            code_inline: {
-              backgroundColor: theme.colors.grey_light,
-              borderRadius: 4,
-              paddingHorizontal: 4,
-            },
-            fence: {
-              backgroundColor: theme.colors.grey_light,
-              borderRadius: 8,
-              padding: 8,
-            },
-          }}
-        >
-          {item.content || '…'}
-        </Markdown>
-      );
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isGenerating, messages, theme],
+    const timeoutId = setTimeout(() => {
+      if (!store.getState().LlmReducer.isGenerating) return;
+      dispatch(llm_action.setGenerating(false));
+      dispatch(llm_action.setGeneratingRoomId(null));
+      Alert.alert('Response Stopped', 'Generation took more than 5 minutes and was stopped automatically.');
+    }, GENERATION_TIMEOUT_MS);
+
+    return () => clearTimeout(timeoutId);
+  }, [dispatch, isGenerating]);
+
+  const contentContainerStyle = useMemo(
+    () => ({padding: theme.spacing.md, paddingBottom: theme.spacing.xl}),
+    [theme.spacing.md, theme.spacing.xl],
+  );
+
+  const borderTopStyle = useMemo(() => ({borderTopColor: theme.colors.grey_light}), [theme.colors.grey_light]);
+
+  const inputStyle = useMemo(() => [styles.textInput, {color: theme.colors.black}], [theme.colors.black]);
+
+  const isSendDisabled = !isGenerating && (!input.trim() || !isModelLoaded);
+  const sendButtonStyle = useMemo(
+    () => [styles.sendButton, {backgroundColor: isSendDisabled ? theme.colors.grey : theme.colors.primary}],
+    [isSendDisabled, theme.colors.grey, theme.colors.primary],
+  );
+
+  const lastMessageId = messages[messages.length - 1]?.id;
+
+  const renderMessageItem = useCallback(
+    ({item}: {item: LlmMessage}) => (
+      <ChatMessageRow
+        item={item}
+        isStreaming={Boolean(isGenerating && item.id === lastMessageId)}
+        textColor={theme.colors.black}
+        codeBg={theme.colors.grey_light}
+        typingColor={theme.colors.grey}
+      />
+    ),
+    [isGenerating, lastMessageId, theme.colors.black, theme.colors.grey_light, theme.colors.grey],
   );
 
   useLayoutEffect(() => {
@@ -324,10 +506,48 @@ const ChatScreen: React.FC = () => {
     });
   }, [navigation, handleClearChat, theme.colors.danger, roomTitle]);
 
+  useEffect(() => {
+    const nextCount = messages.length;
+    const prevCount = prevMessageCountRef.current;
+    prevMessageCountRef.current = nextCount;
+
+    if (nextCount === 0 || nextCount <= prevCount) {
+      return;
+    }
+
+    // Don't auto-scroll when prepending older history — the user is reading upward.
+    if (isPrependingRef.current) {
+      isPrependingRef.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      flatListRef.current?.scrollToEnd({animated: true});
+    }, 16);
+
+    return () => clearTimeout(timer);
+  }, [messages.length]);
+
   return (
     <Container translucent>
       {/* Model status bar */}
-      {!isModelLoaded ? (
+      {isModelLoading ? (
+        <Box
+          paddingHorizontal="md"
+          paddingVertical="xs"
+          backgroundColor="info_light"
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Box flexDirection="row" alignItems="center" flex={1}>
+            <ActivityIndicator size="small" color={theme.colors.info_dark} />
+            <Text variant="body_helper_regular" color="info_dark" marginLeft="xs" flex={1}>
+              Loading model... {progress}%
+            </Text>
+          </Box>
+        </Box>
+      ) : !isModelLoaded ? (
         <Box
           paddingHorizontal="md"
           paddingVertical="xs"
@@ -339,7 +559,7 @@ const ChatScreen: React.FC = () => {
           <Text variant="body_helper_regular" color="warning_dark" flex={1}>
             No model loaded — go to Profile to select one
           </Text>
-          <TouchableOpacity
+          <Pressable
             onPress={() => {
               if (isGenerating) {
                 Alert.alert('Cannot Change Model', 'Please wait for the current response to finish generating.');
@@ -347,11 +567,12 @@ const ChatScreen: React.FC = () => {
                 setShowPicker(true);
               }
             }}
+            disabled={isModelLoading}
           >
             <Text variant="body_helper_semibold" color="warning_dark">
               Select
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </Box>
       ) : null}
 
@@ -360,53 +581,36 @@ const ChatScreen: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={headerHeight}
       >
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          style={{flex: 1}}
-          keyExtractor={item => item.id}
-          contentContainerStyle={{
-            padding: theme.spacing.md,
-            paddingBottom: theme.spacing.xl,
-            flexGrow: 1,
-          }}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd({animated: true})}
-          ListEmptyComponent={
-            <Box flex={1} alignItems="center" justifyContent="center" paddingTop="xxl">
-              <Text variant="h_4_medium" color="grey" textAlign="center">
-                {isModelLoaded ? 'Start a conversation' : 'Load a model in Profile to begin'}
-              </Text>
-            </Box>
-          }
-          renderItem={({item}) => (
-            <Box
-              alignSelf={item.role === 'user' ? 'flex-end' : 'flex-start'}
-              maxWidth="85%"
-              marginBottom="sm"
-              borderRadius="md"
-              paddingHorizontal="md"
-              paddingVertical="xs"
-              backgroundColor={item.role === 'user' ? 'primary' : 'grey_light'}
-            >
-              {item.role === 'user' ? (
-                <Text variant="body_regular" color="white">
-                  {item.content}
+        <Box flex={1}>
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            keyExtractor={item => item.id}
+            contentContainerStyle={contentContainerStyle}
+            // removeClippedSubviews={false} prevents the Fabric
+            // 'Attempt to recycle a mounted view' assertion that fires
+            // when item heights change rapidly during token streaming.
+            removeClippedSubviews={false}
+            maintainVisibleContentPosition={{minIndexForVisible: 0}}
+            onScroll={handleScroll}
+            scrollEventThrottle={200}
+            ListHeaderComponent={
+              isLoadingMore ? (
+                <Box alignItems="center" paddingVertical="sm">
+                  <ActivityIndicator size="small" color={theme.colors.primary} />
+                </Box>
+              ) : null
+            }
+            ListEmptyComponent={
+              <Box flex={1} alignItems="center" justifyContent="center" paddingTop="xxl">
+                <Text variant="h_4_medium" color="grey" textAlign="center">
+                  {isModelLoaded ? 'Start a conversation' : 'Load a model in Profile to begin'}
                 </Text>
-              ) : (
-                renderAssistantContent(item)
-              )}
-              <Text
-                mb={item.role === 'user' ? undefined : 'sm'}
-                mt={'xs'}
-                color={item.role === 'user' ? 'white' : 'grey_dark'}
-                variant={'body_helper_regular'}
-                textAlign={item.role === 'user' ? 'left' : 'right'}
-              >
-                {item.createdAt ? formatChatTime(item.createdAt) : ''}
-              </Text>
-            </Box>
-          )}
-        />
+              </Box>
+            }
+            renderItem={renderMessageItem}
+          />
+        </Box>
 
         {/* Input bar */}
         <Box
@@ -414,7 +618,7 @@ const ChatScreen: React.FC = () => {
           alignItems="flex-end"
           padding="sm"
           borderTopWidth={1}
-          style={{borderTopColor: theme.colors.grey_light}}
+          style={borderTopStyle}
           backgroundColor="white"
         >
           <Box
@@ -434,54 +638,28 @@ const ChatScreen: React.FC = () => {
               placeholderTextColor={theme.colors.grey}
               multiline
               editable={isModelLoaded && !isGenerating}
-              style={{
-                color: theme.colors.black,
-                fontSize: 14,
-                lineHeight: 20,
-                maxHeight: 120,
-                paddingTop: 0,
-                paddingBottom: 0,
-              }}
+              style={inputStyle}
             />
           </Box>
 
-          <TouchableOpacity
+          <Pressable
             onPress={
               isGenerating
                 ? () => {
+                    dispatch(llm_action.setGenerating(false));
                     dispatch(llm_action.setGeneratingRoomId(null));
                   }
                 : handleSend
             }
-            disabled={!isGenerating && (!input.trim() || !isModelLoaded)}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor:
-                !isGenerating && (!input.trim() || !isModelLoaded) ? theme.colors.grey : theme.colors.primary,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
+            disabled={isSendDisabled}
+            style={sendButtonStyle}
           >
             {isGenerating ? (
               <Text style={{fontSize: 24, color: theme.colors.white, fontWeight: 'bold'}}>✕</Text>
             ) : (
-              <View
-                style={{
-                  width: 0,
-                  height: 0,
-                  borderTopWidth: 8,
-                  borderBottomWidth: 8,
-                  borderLeftWidth: 14,
-                  borderTopColor: 'transparent',
-                  borderBottomColor: 'transparent',
-                  borderLeftColor: theme.colors.white,
-                  marginLeft: 3,
-                }}
-              />
+              <View style={[styles.sendArrow, {borderLeftColor: theme.colors.white}]} />
             )}
-          </TouchableOpacity>
+          </Pressable>
         </Box>
       </KeyboardAvoidingView>
 

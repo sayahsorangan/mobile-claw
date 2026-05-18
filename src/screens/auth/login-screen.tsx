@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
 
-import {Alert, Image, TextInput as RNTextInput, TouchableOpacity} from 'react-native';
+import {Alert, Image, Pressable, TextInput as RNTextInput} from 'react-native';
 
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
@@ -105,7 +105,7 @@ const LoginScreen = () => {
         <FadeInView delay={200} slideFrom="bottom" slideDistance={25}>
           <Box flexDirection="row" marginBottom="xl" gap="sm">
             {SOCIAL_BUTTONS.map(item => (
-              <TouchableOpacity
+              <Pressable
                 key={item.key}
                 style={{
                   width: 48,
@@ -123,7 +123,7 @@ const LoginScreen = () => {
                 ) : (
                   <Text style={{...textVariants.h_4_bold, color: item.color}}>{item.label}</Text>
                 )}
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </Box>
         </FadeInView>
@@ -205,11 +205,11 @@ const LoginScreen = () => {
             <Text variant="body_regular" color="grey">
               Don't have account ?{'  '}
             </Text>
-            <TouchableOpacity onPress={() => Navigation.navigate('register')}>
+            <Pressable onPress={() => Navigation.navigate('register')}>
               <Text variant="body_semibold" color="info">
                 Sign up
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </Box>
         </FadeInView>
       </KeyboardAwareScrollView>

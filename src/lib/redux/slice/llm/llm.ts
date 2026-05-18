@@ -81,6 +81,9 @@ const slice = createSlice({
     setMessages: (state, {payload}: PayloadAction<LlmMessage[]>) => {
       state.messages = payload;
     },
+    prependMessages: (state, {payload}: PayloadAction<LlmMessage[]>) => {
+      state.messages = [...payload, ...state.messages];
+    },
     setDownloadProgress: (
       state,
       {payload}: PayloadAction<{modelId: string; progress: number; status: DownloadStatus}>,

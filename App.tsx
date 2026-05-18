@@ -39,18 +39,18 @@ const App = () => {
 
   return (
     <ThemeProvider theme={activeTheme}>
-      <MainNavigator />
+      <ErrorBoundary>
+        <MainNavigator />
+      </ErrorBoundary>
     </ThemeProvider>
   );
 };
 
 function RootApp() {
   return (
-    <ErrorBoundary>
-      <AppProvider>
-        <App />
-      </AppProvider>
-    </ErrorBoundary>
+    <AppProvider>
+      <App />
+    </AppProvider>
   );
 }
 

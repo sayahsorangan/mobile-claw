@@ -1,13 +1,14 @@
 import React, {useCallback, useEffect, useState} from 'react';
 
-import {ActivityIndicator, Alert, Dimensions, FlatList, ScrollView, TouchableOpacity} from 'react-native';
+import {ActivityIndicator, Alert, Dimensions, Pressable, ScrollView} from 'react-native';
 
 import {useAppDispatch, useAppSelector} from '@app/hooks/redux';
 import {Box, Text, useTheme} from '@app/themes';
 import {Modal} from '@components/modal';
 import {MODEL_CATALOG, ModelEntry} from '@lib/llm/catalog';
-import {cancelDownload, deleteModel, getModelFilePath, scanLocalModels, startDownload} from '@lib/llm/downloader';
+import {cancelDownload, deleteModel, scanLocalModels, startDownload} from '@lib/llm/downloader';
 import {DEFAULT_EMBED_MODEL} from '@lib/rag/catalog';
+import {FlashList} from '@shopify/flash-list';
 
 const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -85,19 +86,6 @@ export const ModelPickerSheet: React.FC<Props> = ({visible, onClose, onSelectMod
     [dispatch, refreshLocal],
   );
 
-  const handleSelectFromCatalog = useCallback(
-    (model: ModelEntry) => {
-      const dl = downloads[model.id];
-      if (dl?.status === 'done' && dl.filePath) {
-        onSelectModel(dl.filePath);
-      } else {
-        const path = getModelFilePath(model.filename);
-        onSelectModel(path);
-      }
-    },
-    [downloads, onSelectModel],
-  );
-
   return (
     <Modal
       show={visible}
@@ -120,11 +108,11 @@ export const ModelPickerSheet: React.FC<Props> = ({visible, onClose, onSelectMod
           paddingVertical="md"
         >
           <Text variant="h_4_bold">Model Manager</Text>
-          <TouchableOpacity onPress={onClose} hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+          <Pressable onPress={onClose} hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
             <Text variant="body_regular" color="primary">
               Done
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </Box>
 
         {/* Tabs */}
@@ -138,7 +126,7 @@ export const ModelPickerSheet: React.FC<Props> = ({visible, onClose, onSelectMod
           padding="xxs"
         >
           {(['download', 'local'] as Tab[]).map(tab => (
-            <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)} style={{flex: 1}}>
+            <Pressable key={tab} onPress={() => setActiveTab(tab)} style={{flex: 1}}>
               <Box
                 flex={1}
                 borderRadius="xs"
@@ -150,7 +138,7 @@ export const ModelPickerSheet: React.FC<Props> = ({visible, onClose, onSelectMod
                   {tab === 'download' ? 'Download' : 'My Models'}
                 </Text>
               </Box>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </Box>
 
@@ -162,7 +150,6 @@ export const ModelPickerSheet: React.FC<Props> = ({visible, onClose, onSelectMod
             onDownload={handleDownload}
             onCancel={handleCancel}
             onDelete={handleDelete}
-            onSelect={handleSelectFromCatalog}
           />
         ) : (
           <LocalTab
@@ -185,17 +172,9 @@ interface DownloadTabProps {
   onDownload: (m: ModelEntry) => void;
   onCancel: (id: string) => void;
   onDelete: (m: ModelEntry) => void;
-  onSelect: (m: ModelEntry) => void;
 }
 
-const DownloadTab: React.FC<DownloadTabProps> = ({
-  downloads,
-  currentModelPath,
-  onDownload,
-  onCancel,
-  onDelete,
-  onSelect,
-}) => {
+const DownloadTab: React.FC<DownloadTabProps> = ({downloads, currentModelPath, onDownload, onCancel, onDelete}) => {
   const theme = useTheme();
 
   return (
@@ -286,35 +265,21 @@ const DownloadTab: React.FC<DownloadTabProps> = ({
             {/* Action buttons */}
             <Box flexDirection="row" gap="xs">
               {isDone ? (
-                <>
-                  <TouchableOpacity onPress={() => onSelect(model)} style={{flex: 1}}>
-                    <Box
-                      borderRadius="sm"
-                      paddingVertical="xs"
-                      alignItems="center"
-                      backgroundColor={isActive ? 'primary' : 'primary_light'}
-                    >
-                      <Text variant="body_helper_semibold" color={isActive ? 'white' : 'primary'}>
-                        {isActive ? '✓ Active' : 'Use Model'}
-                      </Text>
-                    </Box>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => onDelete(model)}>
-                    <Box
-                      borderRadius="sm"
-                      paddingVertical="xs"
-                      paddingHorizontal="md"
-                      alignItems="center"
-                      style={{borderWidth: 1, borderColor: theme.colors.danger}}
-                    >
-                      <Text variant="body_helper_semibold" color="danger">
-                        Delete
-                      </Text>
-                    </Box>
-                  </TouchableOpacity>
-                </>
+                <Pressable onPress={() => onDelete(model)} style={{flex: 1}}>
+                  <Box
+                    borderRadius="sm"
+                    paddingVertical="xs"
+                    paddingHorizontal="md"
+                    alignItems="center"
+                    style={{borderWidth: 1, borderColor: theme.colors.danger}}
+                  >
+                    <Text variant="body_helper_semibold" color="danger">
+                      Delete
+                    </Text>
+                  </Box>
+                </Pressable>
               ) : isDownloading ? (
-                <TouchableOpacity onPress={() => onCancel(model.id)} style={{flex: 1}}>
+                <Pressable onPress={() => onCancel(model.id)} style={{flex: 1}}>
                   <Box
                     borderRadius="sm"
                     paddingVertical="xs"
@@ -325,15 +290,15 @@ const DownloadTab: React.FC<DownloadTabProps> = ({
                       Cancel
                     </Text>
                   </Box>
-                </TouchableOpacity>
+                </Pressable>
               ) : (
-                <TouchableOpacity onPress={() => onDownload(model)} style={{flex: 1}}>
+                <Pressable onPress={() => onDownload(model)} style={{flex: 1}}>
                   <Box borderRadius="sm" paddingVertical="xs" alignItems="center" backgroundColor="primary">
                     <Text variant="body_helper_semibold" color="white">
                       {isError ? 'Retry Download' : 'Download'}
                     </Text>
                   </Box>
-                </TouchableOpacity>
+                </Pressable>
               )}
             </Box>
           </Box>
@@ -367,24 +332,24 @@ const LocalTab: React.FC<LocalTabProps> = ({files, scanning, currentModelPath, o
   }
 
   return (
-    <FlatList
+    <FlashList
       data={files}
       keyExtractor={item => item.path}
+      estimatedItemSize={88}
       contentContainerStyle={{
         padding: theme.spacing.md,
         paddingBottom: theme.spacing.xl,
-        flexGrow: 1,
       }}
       ListHeaderComponent={
         <Box flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom="md">
           <Text variant="body_helper_regular" color="grey">
             GGUF models in Documents folder
           </Text>
-          <TouchableOpacity onPress={onRefresh}>
+          <Pressable onPress={onRefresh}>
             <Text variant="body_helper_semibold" color="primary">
               Refresh
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </Box>
       }
       ListEmptyComponent={
@@ -397,7 +362,7 @@ const LocalTab: React.FC<LocalTabProps> = ({files, scanning, currentModelPath, o
       renderItem={({item}) => {
         const isActive = item.path === currentModelPath;
         return (
-          <TouchableOpacity onPress={() => onSelect(item.path)}>
+          <Pressable onPress={() => onSelect(item.path)}>
             <Box
               flexDirection="row"
               alignItems="center"
@@ -424,7 +389,7 @@ const LocalTab: React.FC<LocalTabProps> = ({files, scanning, currentModelPath, o
                 </Box>
               ) : null}
             </Box>
-          </TouchableOpacity>
+          </Pressable>
         );
       }}
     />

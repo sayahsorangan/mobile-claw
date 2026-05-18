@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {ActivityIndicator, StyleProp, TextStyle, TouchableOpacity, ViewProps, ViewStyle} from 'react-native';
+import {ActivityIndicator, Pressable, StyleProp, TextStyle, ViewProps, ViewStyle} from 'react-native';
 
 import {Icons} from '@app/assets/icons';
 import {Box, Text, useTheme} from '@app/themes';
@@ -39,7 +39,7 @@ export const IconButton = React.memo((props: IconButtonProps) => {
   } = props;
 
   return (
-    <TouchableOpacity
+    <Pressable
       disabled={disabled || loading}
       onPress={onPress}
       style={[
@@ -60,9 +60,9 @@ export const IconButton = React.memo((props: IconButtonProps) => {
       ) : (
         <>
           {left_icon ? (
-            <TouchableOpacity disabled={!!!onIconPress} onPress={onIconPress}>
+            <Pressable disabled={!!!onIconPress} onPress={onIconPress}>
               <Icons.Feather name={icon_name} color={icon_color} size={icon_size} />
-            </TouchableOpacity>
+            </Pressable>
           ) : (
             center && <Box style={{width: icon_size + spacing.xs}} />
           )}
@@ -82,14 +82,14 @@ export const IconButton = React.memo((props: IconButtonProps) => {
             </Text>
           )}
           {!left_icon ? (
-            <TouchableOpacity disabled={!!!onIconPress} onPress={onIconPress}>
+            <Pressable disabled={!!!onIconPress} onPress={onIconPress}>
               <Icons.Feather name={icon_name} color={icon_color} size={icon_size} />
-            </TouchableOpacity>
+            </Pressable>
           ) : (
             center && <Box style={{width: icon_size + spacing.xs}} />
           )}
         </>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 });

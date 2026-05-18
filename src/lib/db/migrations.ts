@@ -29,4 +29,19 @@ export function runMigrations() {
   db.executeSync(`
     CREATE INDEX IF NOT EXISTS idx_messages_room ON messages(room_id, created_at);
   `);
+
+  db.executeSync(`
+    CREATE TABLE IF NOT EXISTS notification (
+      id         TEXT PRIMARY KEY,
+      time       TEXT NOT NULL,
+      app        TEXT NOT NULL,
+      title      TEXT,
+      text       TEXT,
+      created_at INTEGER NOT NULL
+    );
+  `);
+
+  db.executeSync(`
+    CREATE INDEX IF NOT EXISTS idx_notification_created ON notification(created_at DESC);
+  `);
 }

@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
 
-import {Alert, TextInput as RNTextInput, TouchableOpacity} from 'react-native';
+import {Alert, Pressable, TextInput as RNTextInput} from 'react-native';
 
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
@@ -273,11 +273,11 @@ const RegisterScreen = () => {
             <Text variant="body_regular" color="grey">
               Already have an account?{'  '}
             </Text>
-            <TouchableOpacity onPress={() => Navigation.back()}>
+            <Pressable onPress={() => Navigation.back()}>
               <Text variant="body_semibold" color="info">
                 Sign in
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </Box>
         </FadeInView>
       </KeyboardAwareScrollView>

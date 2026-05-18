@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {TouchableOpacity, View} from 'react-native';
+import {Pressable, View} from 'react-native';
 
 import {Icons} from '@app/assets/icons';
 import {Text, useTheme} from '@app/themes';
@@ -27,14 +27,14 @@ export const Header = React.memo((props: HeaderProps) => {
         paddingTop: STATUSBAR_HEIGHT + spacing.xs,
       }}
     >
-      <TouchableOpacity
+      <Pressable
         style={{
           padding: spacing.xs,
         }}
         onPress={() => Navigation.back()}
       >
         <Icons.Feather name="chevron-left" size={24} color={colors.grey_dark} />
-      </TouchableOpacity>
+      </Pressable>
       <View style={{flex: 1}}>
         <Text numberOfLines={1} variant={'h_5_medium'} marginHorizontal={'xs'}>
           {title}

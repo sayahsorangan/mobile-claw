@@ -2261,6 +2261,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-documents/picker@npm:^12.0.1":
+  version: 12.0.1
+  resolution: "@react-native-documents/picker@npm:12.0.1"
+  peerDependencies:
+    react: "*"
+    react-native: ">=0.79.0"
+  checksum: 10/5d915828a2baade9b476589738c2dc4ac192b4444006e198e15676e952991bdbf472163bb739592abf581fb7402a193c9cc49319fa986fb7fd6434aaae3a3a68
+  languageName: node
+  linkType: hard
+
 "@react-native/assets-registry@npm:0.84.1":
   version: 0.84.1
   resolution: "@react-native/assets-registry@npm:0.84.1"
@@ -2617,6 +2627,20 @@ __metadata:
     react-redux:
       optional: true
   checksum: 10/2e1098c7fcd10b770344d0b39c58a3b9cb3aec7da0979c02f1ac1ef8f56619ac787c623e480bef0cf6f2c05f1c13fd4d44045c794e2c2d3460f9bf0d2875995c
+  languageName: node
+  linkType: hard
+
+"@shopify/flash-list@npm:^1.7.6":
+  version: 1.8.3
+  resolution: "@shopify/flash-list@npm:1.8.3"
+  dependencies:
+    recyclerlistview: "npm:4.2.3"
+    tslib: "npm:2.8.1"
+  peerDependencies:
+    "@babel/runtime": "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10/6e57686db342104e85d4cc1ee6cbf0323cda48895d03daa3fee3b26a7cd74bab433fe37cf8d6c2d21fd7acdcf4bc2b87ad9e2ec6948656a7b00e951e005d15ba
   languageName: node
   linkType: hard
 
@@ -7285,15 +7309,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"llama.rn@npm:^0.12.0-rc.9":
-  version: 0.12.0-rc.9
-  resolution: "llama.rn@npm:0.12.0-rc.9"
+"llama.rn@npm:^0.12.0":
+  version: 0.12.0
+  resolution: "llama.rn@npm:0.12.0"
   peerDependencies:
     react: "*"
     react-native: "*"
   bin:
     llama-rn-download-artifacts: install/download-native-artifacts.js
-  checksum: 10/fc8d77dcdf87b135558ada511c091f8b171e6fa85f84d6a643c35fa9eda59059fbe758de0a706198fd7801aff71027a779c6f41097d9dd50b84c9ebc4eb3ce03
+  checksum: 10/bcf79bf87791a0c0a53ca5e624af8cfee9f56de3af793f280e9f85babbb0f27996722ca9908200ff13175e80af3e2eeba43339b6803694a4ec2a536e46acbe22
   languageName: node
   linkType: hard
 
@@ -7325,7 +7349,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash.debounce@npm:^4.0.8":
+"lodash.debounce@npm:4.0.8, lodash.debounce@npm:^4.0.8":
   version: 4.0.8
   resolution: "lodash.debounce@npm:4.0.8"
   checksum: 10/cd0b2819786e6e80cb9f5cda26b1a8fc073daaf04e48d4cb462fa4663ec9adb3a5387aa22d7129e48eed1afa05b482e2a6b79bfc99b86886364449500cbb00fd
@@ -8550,7 +8574,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.5.10, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:15.8.1, prop-types@npm:^15.5.10, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -8698,22 +8722,6 @@ __metadata:
   peerDependencies:
     react-native: "*"
   checksum: 10/9f945a16bd1aebefc60868e22552375bc630eb98d5505d8cdc847d7841a226540408e7ea174cbb4eb5bfec17235eaca731d154082f64e4935e2a4d2e0244b39b
-  languageName: node
-  linkType: hard
-
-"react-native-document-picker@npm:^9.3.1":
-  version: 9.3.1
-  resolution: "react-native-document-picker@npm:9.3.1"
-  dependencies:
-    invariant: "npm:^2.2.4"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-    react-native-windows: "*"
-  peerDependenciesMeta:
-    react-native-windows:
-      optional: true
-  checksum: 10/26829e8b0e48e789defea3f418ab41a154c05b72be742f2a2de182812c86eb2f35f31dcd5488b5b99e6bbf3b8c920c76acf06bc44d0222889e6cdf32d13cc1df
   languageName: node
   linkType: hard
 
@@ -8992,6 +9000,20 @@ __metadata:
     string_decoder: "npm:^1.1.1"
     util-deprecate: "npm:^1.0.1"
   checksum: 10/d9e3e53193adcdb79d8f10f2a1f6989bd4389f5936c6f8b870e77570853561c362bee69feca2bbb7b32368ce96a85504aa4cedf7cf80f36e6a9de30d64244048
+  languageName: node
+  linkType: hard
+
+"recyclerlistview@npm:4.2.3":
+  version: 4.2.3
+  resolution: "recyclerlistview@npm:4.2.3"
+  dependencies:
+    lodash.debounce: "npm:4.0.8"
+    prop-types: "npm:15.8.1"
+    ts-object-utils: "npm:0.0.5"
+  peerDependencies:
+    react: ">= 15.2.1"
+    react-native: ">= 0.30.0"
+  checksum: 10/a759db18297cb2dde362c448763983d84130b25b2bead2db4da525c0b79ce67ae8a6433f83a6f6cd32c42bbe7d78bc29a4d5f8b59da6eda27a49968588d9433b
   languageName: node
   linkType: hard
 
@@ -9918,6 +9940,7 @@ __metadata:
     "@react-native-community/cli-platform-ios": "npm:20.1.3"
     "@react-native-community/datetimepicker": "npm:^9.1.0"
     "@react-native-community/eslint-config": "npm:^3.2.0"
+    "@react-native-documents/picker": "npm:^12.0.1"
     "@react-native/babel-preset": "npm:0.84.1"
     "@react-native/eslint-config": "npm:0.84.1"
     "@react-native/metro-config": "npm:0.84.1"
@@ -9926,6 +9949,7 @@ __metadata:
     "@react-navigation/native": "npm:^7.2.2"
     "@react-navigation/native-stack": "npm:^7.3.10"
     "@reduxjs/toolkit": "npm:^2.8.0"
+    "@shopify/flash-list": "npm:^1.7.6"
     "@shopify/restyle": "npm:^2.4.5"
     "@tanstack/query-sync-storage-persister": "npm:4.0.5"
     "@tanstack/react-query": "npm:4.0.5"
@@ -9951,7 +9975,7 @@ __metadata:
     i18next: "npm:^25.1.1"
     jest: "npm:^29.7.0"
     ky: "npm:^2.0.2"
-    llama.rn: "npm:^0.12.0-rc.9"
+    llama.rn: "npm:^0.12.0"
     minimist: "npm:^1.2.8"
     moment: "npm:^2.30.1"
     prettier: "npm:2.8.8"
@@ -9959,7 +9983,6 @@ __metadata:
     react-i18next: "npm:^15.5.1"
     react-native: "npm:0.84.1"
     react-native-device-info: "npm:^15.0.2"
-    react-native-document-picker: "npm:^9.3.1"
     react-native-fs: "npm:^2.20.0"
     react-native-get-random-values: "npm:^2.0.0"
     react-native-keyboard-aware-scroll-view: "npm:^0.9.5"
@@ -10145,6 +10168,20 @@ __metadata:
     ts-node-transpile-only: dist/bin-transpile.js
     ts-script: dist/bin-script-deprecated.js
   checksum: 10/a91a15b3c9f76ac462f006fa88b6bfa528130dcfb849dd7ef7f9d640832ab681e235b8a2bc58ecde42f72851cc1d5d4e22c901b0c11aa51001ea1d395074b794
+  languageName: node
+  linkType: hard
+
+"ts-object-utils@npm:0.0.5":
+  version: 0.0.5
+  resolution: "ts-object-utils@npm:0.0.5"
+  checksum: 10/83c48fbdaba392fb2c01cea53b267ed5538d2bb44fc6c3eecc10bcfabc1780bfa6ec8569b52bbf0140d9b521d9049d5f15884e12286918244d463d854dbc73cb
+  languageName: node
+  linkType: hard
+
+"tslib@npm:2.8.1":
+  version: 2.8.1
+  resolution: "tslib@npm:2.8.1"
+  checksum: 10/3e2e043d5c2316461cb54e5c7fe02c30ef6dccb3384717ca22ae5c6b5bc95232a6241df19c622d9c73b809bea33b187f6dbc73030963e29950c2141bc32a79f7
   languageName: node
   linkType: hard
 

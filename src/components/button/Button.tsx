@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {ActivityIndicator, StyleProp, Text, TextStyle, TouchableOpacity, ViewStyle} from 'react-native';
+import {ActivityIndicator, Pressable, StyleProp, Text, TextStyle, ViewStyle} from 'react-native';
 
 import {useTheme} from '@app/themes';
 
@@ -31,7 +31,7 @@ export const Button = React.memo((props: ButtonProps) => {
   } = props;
 
   return (
-    <TouchableOpacity
+    <Pressable
       disabled={disabled || loading}
       onPress={onPress}
       style={[
@@ -69,6 +69,6 @@ export const Button = React.memo((props: ButtonProps) => {
           {rightItem ?? rightItem}
         </>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 });

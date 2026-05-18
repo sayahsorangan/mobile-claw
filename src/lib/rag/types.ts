@@ -46,8 +46,10 @@ export interface RetrievedChunk {
 
 /** Options for retrieval */
 export interface RetrieveOptions {
-  /** Number of top chunks to return (default: 4) */
+  /** Number of final chunks to return (default: 3) */
   topK?: number;
+  /** Candidate pool size for the reranking stage (default: 10) */
+  candidatePool?: number;
   /** Minimum similarity score 0–1 to include (default: 0.0) */
   minScore?: number;
 }

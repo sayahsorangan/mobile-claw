@@ -1,6 +1,6 @@
 import React, {useCallback, useState} from 'react';
 
-import {ActivityIndicator, Alert, FlatList, TouchableOpacity} from 'react-native';
+import {ActivityIndicator, Alert, Pressable} from 'react-native';
 
 import {useFocusEffect} from '@react-navigation/native';
 import Feather from 'react-native-vector-icons/Feather';
@@ -14,6 +14,81 @@ import {Container} from '@components/container';
 import {deleteRoom, getAllRooms, Room} from '@lib/db/chat-repository';
 import {Navigation} from '@router/navigation-helper';
 import {Route} from '@router/route-name';
+import {FlashList} from '@shopify/flash-list';
+
+const ChatRow = React.memo(
+  ({
+    item,
+    generatingRoomId,
+    onPress,
+    onLongPress,
+  }: {
+    item: Room;
+    generatingRoomId: string | null;
+    onPress: (roomId: string) => void;
+    onLongPress: (room: Room) => void;
+  }) => {
+    const theme = useTheme();
+
+    return (
+      <Pressable onPress={() => onPress(item.id)} onLongPress={() => onLongPress(item)} delayLongPress={500}>
+        <Box flexDirection="row" alignItems="center" paddingVertical="sm" backgroundColor="white">
+          <Box
+            width={44}
+            height={44}
+            borderRadius="round"
+            backgroundColor="primary_light"
+            alignItems="center"
+            justifyContent="center"
+            marginRight="sm"
+          >
+            <Feather name="message-circle" size={20} color={theme.colors.primary} />
+          </Box>
+          <Box flex={1}>
+            <Box flexDirection="row" alignItems="center">
+              <Text variant="body_semibold" numberOfLines={1} flex={1}>
+                {item.title}
+              </Text>
+              {item.id === generatingRoomId ? (
+                <ActivityIndicator size="small" color={theme.colors.primary} style={{marginLeft: 6}} />
+              ) : null}
+            </Box>
+            {item.id === generatingRoomId ? (
+              <Text variant="body_helper_regular" color="primary" numberOfLines={1}>
+                Generating response...
+              </Text>
+            ) : item.modelPath ? (
+              <Text variant="body_helper_regular" color="grey" numberOfLines={1}>
+                {item.modelPath.split('/').pop()}
+              </Text>
+            ) : null}
+          </Box>
+          <Text variant="body_helper_regular" color="grey" marginLeft="sm">
+            {formatChatTime(item.updatedAt as any)}
+          </Text>
+        </Box>
+      </Pressable>
+    );
+  },
+);
+
+const ListEmpty = React.memo(() => {
+  const theme = useTheme();
+
+  return (
+    <Box flex={1} alignItems="center" justifyContent="center" paddingTop="xxl">
+      <Feather name="message-circle" size={48} color={theme.colors.grey_light} />
+      <Text variant="h_5_medium" color="grey" marginTop="md">
+        No chats yet
+      </Text>
+      <Text variant="body_helper_regular" color="grey" marginTop="xs" textAlign="center">
+        Tap the pencil icon to start a new conversation
+      </Text>
+    </Box>
+  );
+});
+
+const ItemSeparator = React.memo(() => <Box height={1} backgroundColor="grey_light" marginLeft="md" />);
 
 const MainHomeScreen: React.FC = () => {
   const theme = useTheme();
@@ -47,75 +122,36 @@ const MainHomeScreen: React.FC = () => {
     [loadRooms, generatingRoomId],
   );
 
+  const handleOpenChat = useCallback((roomId: string) => {
+    Navigation.navigate(Route.chat, {roomId});
+  }, []);
+
+  const renderItem = useCallback(
+    ({item}: {item: Room}) => {
+      return (
+        <ChatRow item={item} generatingRoomId={generatingRoomId} onPress={handleOpenChat} onLongPress={handleDelete} />
+      );
+    },
+    [generatingRoomId, handleDelete, handleOpenChat],
+  );
+
   return (
     <Container>
       <Text variant="h_5_semibold" paddingHorizontal="md" paddingTop="md">
         Chats
       </Text>
 
-      <FlatList
+      <FlashList
         data={rooms}
         keyExtractor={item => item.id}
+        estimatedItemSize={76}
         contentContainerStyle={{
           paddingHorizontal: theme.spacing.md,
           paddingBottom: theme.spacing.xxl,
-          flexGrow: 1,
         }}
-        ListEmptyComponent={
-          <Box flex={1} alignItems="center" justifyContent="center" paddingTop="xxl">
-            <Feather name="message-circle" size={48} color={theme.colors.grey_light} />
-            <Text variant="h_5_medium" color="grey" marginTop="md">
-              No chats yet
-            </Text>
-            <Text variant="body_helper_regular" color="grey" marginTop="xs" textAlign="center">
-              Tap the pencil icon to start a new conversation
-            </Text>
-          </Box>
-        }
-        ItemSeparatorComponent={() => <Box height={1} backgroundColor="grey_light" marginLeft="md" />}
-        renderItem={({item}) => (
-          <TouchableOpacity
-            onPress={() => Navigation.navigate(Route.chat, {roomId: item.id})}
-            onLongPress={() => handleDelete(item)}
-            delayLongPress={500}
-          >
-            <Box flexDirection="row" alignItems="center" paddingVertical="sm" backgroundColor="white">
-              <Box
-                width={44}
-                height={44}
-                borderRadius="round"
-                backgroundColor="primary_light"
-                alignItems="center"
-                justifyContent="center"
-                marginRight="sm"
-              >
-                <Feather name="message-circle" size={20} color={theme.colors.primary} />
-              </Box>
-              <Box flex={1}>
-                <Box flexDirection="row" alignItems="center">
-                  <Text variant="body_semibold" numberOfLines={1} flex={1}>
-                    {item.title}
-                  </Text>
-                  {item.id === generatingRoomId ? (
-                    <ActivityIndicator size="small" color={theme.colors.primary} style={{marginLeft: 6}} />
-                  ) : null}
-                </Box>
-                {item.id === generatingRoomId ? (
-                  <Text variant="body_helper_regular" color="primary" numberOfLines={1}>
-                    Generating response…
-                  </Text>
-                ) : item.modelPath ? (
-                  <Text variant="body_helper_regular" color="grey" numberOfLines={1}>
-                    {item.modelPath.split('/').pop()}
-                  </Text>
-                ) : null}
-              </Box>
-              <Text variant="body_helper_regular" color="grey" marginLeft="sm">
-                {formatChatTime(item.updatedAt as any)}
-              </Text>
-            </Box>
-          </TouchableOpacity>
-        )}
+        ListEmptyComponent={ListEmpty}
+        ItemSeparatorComponent={ItemSeparator}
+        renderItem={renderItem}
       />
       <Box position={'absolute'} right={theme.spacing.md} bottom={TAB_HEIGHT + theme.spacing.xl}>
         <IconButton

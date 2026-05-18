@@ -1,6 +1,6 @@
 import React, {useCallback, useState} from 'react';
 
-import {ActivityIndicator, Alert, ScrollView, TouchableOpacity} from 'react-native';
+import {ActivityIndicator, Alert, Pressable, ScrollView} from 'react-native';
 
 import {onLogout} from '@app/helpers/auth';
 import {useAppSelector} from '@app/hooks/redux';
@@ -77,7 +77,7 @@ const ProfileScreen: React.FC = () => {
           </Text>
           <Box backgroundColor="white" borderRadius="md" overflow="hidden">
             {/* Model */}
-            <TouchableOpacity
+            <Pressable
               onPress={() => {
                 if (isGenerating) {
                   Alert.alert('Cannot Change Model', 'Please wait for the current response to finish generating.');
@@ -121,11 +121,11 @@ const ProfileScreen: React.FC = () => {
                   </Text>
                 )}
               </Box>
-            </TouchableOpacity>
+            </Pressable>
 
             {/* Unload model */}
             {isModelLoaded ? (
-              <TouchableOpacity
+              <Pressable
                 onPress={() => {
                   if (isGenerating) {
                     Alert.alert('Cannot Unload Model', 'Please wait for the current response to finish generating.');
@@ -149,11 +149,11 @@ const ProfileScreen: React.FC = () => {
                     Unload
                   </Text>
                 </Box>
-              </TouchableOpacity>
+              </Pressable>
             ) : null}
 
             {/* Language */}
-            <TouchableOpacity onPress={() => setShowLangPicker(true)}>
+            <Pressable onPress={() => setShowLangPicker(true)}>
               <Box
                 flexDirection="row"
                 alignItems="center"
@@ -166,7 +166,7 @@ const ProfileScreen: React.FC = () => {
                   {selectedLang}
                 </Text>
               </Box>
-            </TouchableOpacity>
+            </Pressable>
           </Box>
 
           {/* Account section */}
@@ -174,13 +174,13 @@ const ProfileScreen: React.FC = () => {
             ACCOUNT
           </Text>
           <Box backgroundColor="white" borderRadius="md" overflow="hidden">
-            <TouchableOpacity onPress={handleLogout}>
+            <Pressable onPress={handleLogout}>
               <Box paddingHorizontal="md" paddingVertical="sm">
                 <Text variant="body_regular" color="danger">
                   Sign Out
                 </Text>
               </Box>
-            </TouchableOpacity>
+            </Pressable>
           </Box>
         </Box>
       </ScrollView>
@@ -208,14 +208,14 @@ const ProfileScreen: React.FC = () => {
             style={{borderBottomColor: theme.colors.grey_light}}
           >
             <Text variant="h_5_semibold">Response Language</Text>
-            <TouchableOpacity onPress={() => setShowLangPicker(false)} hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+            <Pressable onPress={() => setShowLangPicker(false)} hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
               <Text variant="body_regular" color="primary">
                 Done
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </Box>
           {LANGUAGES.map(lang => (
-            <TouchableOpacity
+            <Pressable
               key={lang.value}
               onPress={() => {
                 setLanguage(lang.value);
@@ -247,7 +247,7 @@ const ProfileScreen: React.FC = () => {
                   </Box>
                 ) : null}
               </Box>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </Box>
       </Modal>

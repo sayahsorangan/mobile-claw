@@ -1,4 +1,4 @@
-import {TouchableOpacity} from 'react-native';
+import {Pressable} from 'react-native';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -57,14 +57,14 @@ const CustomHeader = (p: any) => {
       borderBottomWidth={1}
       borderColor="grey_light"
     >
-      <TouchableOpacity
+      <Pressable
         style={{
           padding: theme.spacing.xs,
         }}
         onPress={() => p.navigation.goBack()}
       >
         <Icons.Feather name="chevron-left" size={24} color={theme.colors.grey_dark} />
-      </TouchableOpacity>
+      </Pressable>
       <Box flex={1}>
         <Text numberOfLines={1} variant={'h_6_medium'} marginHorizontal={'xs'}>
           {p.options.title}

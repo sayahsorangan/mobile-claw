@@ -1,7 +1,8 @@
 import {ChunkOptions} from './types';
 
-const DEFAULT_CHUNK_SIZE = 512; // chars (~128 tokens)
-const DEFAULT_OVERLAP = 64; // chars
+// Mobile-optimised defaults — fits within the RAG token budget (~400 tokens)
+const DEFAULT_CHUNK_SIZE = 300; // chars (~75 tokens) — recommended for mobile
+const DEFAULT_OVERLAP = 50; // chars — ~15% overlap for continuity
 
 /**
  * Splits text into overlapping character-window chunks.

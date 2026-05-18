@@ -19,11 +19,16 @@ function cosineSimilarity(a: number[], b: number[]): number {
 }
 
 /**
- * Retrieve the top-K most relevant chunks for a query string.
+ * Retrieve the top-K most relevant chunks for a query string using a
+ * two-stage pipeline: embed search → candidate pool → rerank → final K.
+ *
+ * Default pipeline: retrieve top 10 candidates, return top 3.
  * Requires the embedding model to be loaded via loadEmbedModel().
  */
 export async function retrieve(query: string, options?: RetrieveOptions): Promise<RetrievedChunk[]> {
-  const topK = options?.topK ?? 4;
+  // Mobile-safe defaults: top 3 results from a 10-candidate pool
+  const topK = options?.topK ?? 3;
+  const candidatePool = Math.max(topK, options?.candidatePool ?? 10);
   const minScore = options?.minScore ?? 0.0;
 
   const queryEmbedding = await embed(query);
@@ -41,9 +46,31 @@ export async function retrieve(query: string, options?: RetrieveOptions): Promis
     }
   }
 
-  // Sort descending by score, take top-K
+  // Stage 1: sort by embedding similarity, keep candidate pool
   scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, topK);
+  const candidates = scored.slice(0, candidatePool);
+
+  // Stage 2: rerank candidates by exact query-term overlap (keyword boost)
+  const queryTerms = query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(t => t.length > 2);
+
+  if (queryTerms.length > 0) {
+    candidates.sort((a, b) => {
+      const aText = a.chunk.text.toLowerCase();
+      const bText = b.chunk.text.toLowerCase();
+      const aBoost = queryTerms.filter(t => aText.includes(t)).length;
+      const bBoost = queryTerms.filter(t => bText.includes(t)).length;
+      // Combine embedding score + keyword boost (weight: 0.7 embed + 0.3 keyword)
+      const aFinal = a.score * 0.7 + (aBoost / queryTerms.length) * 0.3;
+      const bFinal = b.score * 0.7 + (bBoost / queryTerms.length) * 0.3;
+      return bFinal - aFinal;
+    });
+  }
+
+  // Return final top-K
+  return candidates.slice(0, topK);
 }
 
 /**

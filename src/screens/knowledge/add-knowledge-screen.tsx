@@ -1,15 +1,8 @@
 import React, {useCallback, useState} from 'react';
 
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  TextInput as RNTextInput,
-  TouchableOpacity,
-} from 'react-native';
+import {Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput as RNTextInput} from 'react-native';
 
-import DocumentPicker from 'react-native-document-picker';
+import {errorCodes, isErrorWithCode, keepLocalCopy, pick, types} from '@react-native-documents/picker';
 
 import {Box, Text, useTheme} from '@app/themes';
 import {Button} from '@components/button/Button';
@@ -31,17 +24,26 @@ const AddKnowledgeScreen: React.FC = () => {
 
   const handlePickFile = useCallback(async () => {
     try {
-      const result = await DocumentPicker.pickSingle({
-        type: [DocumentPicker.types.plainText],
-        copyTo: 'cachesDirectory',
+      const [result] = await pick({
+        type: [types.plainText],
       });
-      const uri = result.fileCopyUri ?? result.uri;
+      const fileName = result.name ?? 'document.txt';
+      const copyResults = await keepLocalCopy({
+        files: [{uri: result.uri, fileName}],
+        destination: 'cachesDirectory',
+      });
+      const copyResult = copyResults[0];
+      if (copyResult.status === 'error') {
+        Alert.alert('Error', copyResult.copyError);
+        return;
+      }
+      const localUri = copyResult.localUri;
       // Strip file:// prefix for RNFS compatibility on iOS; Android content URIs are handled by RNFS
-      const path = Platform.OS === 'ios' ? decodeURIComponent(uri.replace(/^file:\/\//, '')) : uri;
+      const path = Platform.OS === 'ios' ? decodeURIComponent(localUri.replace(/^file:\/\//, '')) : localUri;
       setPickedFilePath(path);
-      setPickedFileName(result.name ?? 'document.txt');
+      setPickedFileName(fileName);
     } catch (e) {
-      if (!DocumentPicker.isCancel(e)) {
+      if (!isErrorWithCode(e, errorCodes.OPERATION_CANCELED)) {
         Alert.alert('Error', 'Could not open the file picker.');
       }
     }
@@ -84,7 +86,7 @@ const AddKnowledgeScreen: React.FC = () => {
             padding="xxs"
           >
             {(['text', 'file'] as AddMode[]).map(mode => (
-              <TouchableOpacity key={mode} onPress={() => setAddMode(mode)} style={{flex: 1}}>
+              <Pressable key={mode} onPress={() => setAddMode(mode)} style={{flex: 1}}>
                 <Box
                   flex={1}
                   borderRadius="xs"
@@ -96,7 +98,7 @@ const AddKnowledgeScreen: React.FC = () => {
                     {mode === 'text' ? 'Write Text' : 'From File (.txt)'}
                   </Text>
                 </Box>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </Box>
 
@@ -159,7 +161,7 @@ const AddKnowledgeScreen: React.FC = () => {
                 Tap the button below to pick a plain text file from your device.
               </Text>
 
-              <TouchableOpacity onPress={handlePickFile} disabled={ingesting}>
+              <Pressable onPress={handlePickFile} disabled={ingesting}>
                 <Box
                   borderRadius="md"
                   borderWidth={1}
@@ -191,7 +193,7 @@ const AddKnowledgeScreen: React.FC = () => {
                     </>
                   )}
                 </Box>
-              </TouchableOpacity>
+              </Pressable>
             </>
           )}
 

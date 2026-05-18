@@ -109,6 +109,28 @@ export function getMessagesByRoom(roomId: string): Message[] {
   }));
 }
 
+export function getMessagesByRoomPaginated(roomId: string, limit: number, beforeCreatedAt?: number): Message[] {
+  const result =
+    beforeCreatedAt !== undefined
+      ? getDb().executeSync(
+          'SELECT * FROM messages WHERE room_id = ? AND created_at < ? ORDER BY created_at DESC LIMIT ?',
+          [roomId, beforeCreatedAt, limit],
+        )
+      : getDb().executeSync('SELECT * FROM messages WHERE room_id = ? ORDER BY created_at DESC LIMIT ?', [
+          roomId,
+          limit,
+        ]);
+  const rows = (result.rows ?? []).map(r => ({
+    id: r.id as string,
+    roomId: r.room_id as string,
+    role: r.role as 'user' | 'assistant',
+    content: r.content as string,
+    createdAt: r.created_at as number,
+  }));
+  // Reverse so result is chronological (oldest → newest)
+  return rows.reverse();
+}
+
 export function deleteMessagesByRoom(roomId: string) {
   getDb().executeSync('DELETE FROM messages WHERE room_id = ?', [roomId]);
 }
