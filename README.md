@@ -1,11 +1,12 @@
-# Course App — React Native Template
+# Course App - React Native Template
 
-A mobile course application built with **React Native 0.84.1** + **TypeScript 5.8.3**. Bare React Native (no Expo), using `@react-native-community/cli`.
+A mobile application template built with **React Native 0.84.1** and **TypeScript 5.8.3**.
+This project uses bare React Native (no Expo) with `@react-native-community/cli`.
 
 ## Prerequisites
 
 - Node.js >= 22.11.0
-- Yarn 1.22+
+- Yarn
 - Ruby (for iOS CocoaPods)
 - Xcode (iOS) / Android Studio (Android)
 - JDK 17+ (Android)
@@ -45,6 +46,7 @@ yarn ios
 | `yarn env:prd`       | Switch to production environment  |
 | `yarn android:clean` | Clean Android build               |
 | `yarn android:build` | Production Android APK build      |
+| `yarn postinstall`   | Run project post-install script   |
 
 ## Project Structure
 
@@ -58,12 +60,11 @@ src/
 │   ├── organisms/       # Complex composed components (provider.tsx)
 │   └── *.tsx            # Standalone shared components (Header, Container, Avatar, etc.)
 ├── constan/             # Constants (app.ts, dimensions.ts) — note: "constan" not "constants"
-├── helpers/             # Utility functions (api.tsx, auth.tsx)
+├── helpers/             # Utility functions (app.tsx, auth.tsx)
 ├── hooks/               # Custom React hooks (redux.ts)
 ├── i18n/                # i18next setup + locales/ (en.json, id.json)
 ├── lib/                 # 3rd-party library integrations
 │   ├── ky/              # HTTP client (base.ts, hooks.ts, index.ts)
-│   ├── llm/             # On-device LLM (index.ts, types.ts, hooks.ts, catalog.ts, downloader.ts)
 │   ├── react-query/     # Data fetching layer
 │   │   ├── {feature}/   # Feature-scoped: hooks.ts, keys.ts, service.ts, types.ts
 │   │   ├── custom-hooks.ts  # Generic useRQ/useMQ/useInfiniteRQ wrappers
@@ -75,8 +76,6 @@ src/
 │   │   ├── root-reducer.ts  # Combined reducers
 │   │   └── store-key.ts     # Slice key constants
 │   └── storage/         # MMKV storage adapters (redux-storage, query-storage)
-├── model/               # TypeScript type definitions
-│   └── API/             # API response/request types (namespace-based: IUser, IApp)
 ├── router/              # Navigation configuration
 │   ├── main-navigation.tsx   # NavigationContainer entry
 │   ├── stack-navigation.tsx  # Root stack (splash → login → tabs)
@@ -86,7 +85,6 @@ src/
 │   └── linking.ts            # Deep link config
 ├── screens/             # Screen components grouped by feature/
 │   ├── auth/            # login-screen.tsx
-│   ├── chat/            # chat-screen.tsx + components/model-picker-sheet.tsx
 │   ├── home/            # main-home.tsx
 │   ├── splash-screen.tsx
 │   └── empty-screen.tsx
@@ -111,13 +109,10 @@ src/
 | Icons            | react-native-vector-icons (Feather)             |
 | i18n             | i18next 25 + react-i18next 15                   |
 | Date Picker      | @react-native-community/datetimepicker 9        |
-| On-device LLM    | llama.rn 0.12 (GGUF, llama.cpp)                 |
-| File System      | react-native-fs 2 (model downloads)             |
-| Markdown         | react-native-markdown-display 7                 |
 | Testing          | Jest 29 + @testing-library/react-native 13      |
 | Fonts            | Inter (Regular, Medium, SemiBold, Bold)         |
 | Debugging        | Reactotron + Redux Flipper                      |
-| Git Hooks        | Lefthook (ESLint → Prettier → import-sorter)    |
+| Git Hooks        | Lefthook (ESLint -> Prettier -> import-sorter)  |
 
 ## Import Aliases
 
@@ -167,8 +162,7 @@ Tests use `renderWithProviders` from `src/test-utils.tsx` which wraps components
 - Use `Box` / `Text` from `@app/themes` instead of raw `View` / `Text`
 - Use `Container` as screen wrappers
 - Use `useAppSelector` / `useAppDispatch` from `@app/hooks/redux`
-- Use `Api` from `@lib/ky/base` for HTTP requests
+- Use `Api` from `@lib/ky` for HTTP requests
 - Screens are default-exported and placed in `src/screens/{feature}/`
 - Redux slices follow: store-key → slice → root-reducer registration
 - React Query follows: query-key → service → hook → query-hooks export
-# mobile-claw

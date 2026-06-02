@@ -4,7 +4,6 @@
     "baseUrl": ".",
     "paths": {
       "@router/*": ["./src/router/*"],
-      "@models/*": ["./src/model/*"],
       "@config": ["./config/env"],
       "@react-query/*": ["./src/lib/react-query/*"],
       "@redux-store/*": ["./src/lib/redux/*"],
