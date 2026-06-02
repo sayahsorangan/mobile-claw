@@ -10,9 +10,6 @@ import {Icons} from '@app/assets/icons';
 import {TAB_HEIGHT} from '@app/constan/dimensions';
 import {useTheme} from '@app/themes';
 import {MainHomeScreen} from '@screens/home/main-home';
-import KnowledgeScreen from '@screens/knowledge/knowledge-screen';
-import NotificationScreen from '@screens/notification/notification-screen';
-import ProfileScreen from '@screens/profile/profile-screen';
 
 import {IBottomTabScreen} from './route-name';
 
@@ -44,9 +41,6 @@ const renderBottomTab = (props: any) => <BottomTab {...props} />;
 export const BottomTabScreen = () => (
   <Tab.Navigator screenOptions={{headerShown: false}} tabBar={renderBottomTab}>
     <Tab.Screen name="home" component={MainHomeScreen} />
-    <Tab.Screen name="knowledge" component={KnowledgeScreen} />
-    <Tab.Screen name="notification" component={NotificationScreen} />
-    <Tab.Screen name="profile" component={ProfileScreen} />
   </Tab.Navigator>
 );
 

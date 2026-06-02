@@ -1,12 +1,11 @@
 import {storeKey} from '@lib/redux/store-key';
 import {persistReducer} from '@lib/storage/redux-storage';
-import {IApp} from '@models/API/app';
-import {IUser} from '@models/API/user';
+import {IApp} from '@react-query/base-types';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 const initialState = {
   auth: undefined as IApp.IAuth | undefined,
-  user: undefined as IUser.User | undefined,
+  user: undefined as any | undefined,
 };
 
 const slice = createSlice({
@@ -16,10 +15,10 @@ const slice = createSlice({
     setAuth: (state, {payload}: PayloadAction<IApp.IAuth>) => {
       state.auth = payload;
     },
-    setUser: (state, {payload}: PayloadAction<IUser.User>) => {
+    setUser: (state, {payload}: PayloadAction<any>) => {
       state.user = payload;
     },
-    updateUserProfile: (state, {payload}: PayloadAction<Partial<IUser.User>>) => {
+    updateUserProfile: (state, {payload}: PayloadAction<Partial<any>>) => {
       if (state.user) {
         state.user = {...state.user, ...payload};
       }

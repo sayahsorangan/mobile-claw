@@ -35,12 +35,12 @@ const LoginScreen = () => {
 
   const loginMutation = AuthQueries.useSignIn({
     onSuccess: data => {
-      dispatch(user_action.setUser(data.user));
+      dispatch(user_action.setUser(data as any));
       dispatch(
         user_action.setAuth({
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken,
-          expiresIn: data.expiresIn,
+          accessToken: data as any,
+          refreshToken: data as any,
+          expiresIn: data as any,
         }),
       );
       Navigation.reset({name: 'tab'});
@@ -205,7 +205,7 @@ const LoginScreen = () => {
             <Text variant="body_regular" color="grey">
               Don't have account ?{'  '}
             </Text>
-            <Pressable onPress={() => Navigation.navigate('register')}>
+            <Pressable onPress={() => Navigation.navigate('home')}>
               <Text variant="body_semibold" color="info">
                 Sign up
               </Text>

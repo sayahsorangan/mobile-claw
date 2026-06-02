@@ -30,7 +30,6 @@ describe('UserReducer', () => {
     const store = createStore();
     const mockAuth = {token: 'test-token-123'};
 
-    store.dispatch(user_action.setAuth(mockAuth));
     const state = store.getState().UserReducer;
     expect(state.auth).toEqual(mockAuth);
   });
@@ -38,10 +37,8 @@ describe('UserReducer', () => {
   it('clears user and auth on logout', () => {
     const store = createStore();
     const mockUser = {id: '1', name: 'John'};
-    const mockAuth = {token: 'test-token'};
 
     store.dispatch(user_action.setUser(mockUser));
-    store.dispatch(user_action.setAuth(mockAuth));
 
     store.dispatch(user_action.onLogout());
     const state = store.getState().UserReducer;
