@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {ActivityIndicator, Pressable, StyleProp, Text, TextStyle, ViewStyle} from 'react-native';
+import {ActivityIndicator, StyleProp, Text, TextStyle, TouchableOpacity, ViewStyle} from 'react-native';
 
 import {useTheme} from '@app/themes';
 
@@ -31,20 +31,20 @@ export const Button = React.memo((props: ButtonProps) => {
   } = props;
 
   return (
-    <Pressable
+    <TouchableOpacity
       disabled={disabled || loading}
       onPress={onPress}
       style={[
         {
-          backgroundColor: disabled ? colors.grey : secondary ? colors.white : colors.primary_dark,
-          borderRadius: borderRadii.xs,
-          height: 48,
+          backgroundColor: disabled ? colors.grey : secondary ? colors.white : colors.primary,
+          borderRadius: borderRadii.lg,
+          height: 56,
           borderWidth: disabled ? 0 : 1,
-          borderColor: colors.primary_dark,
+          borderColor: colors.primary,
           justifyContent: 'center',
           alignItems: 'center',
           flex: 1,
-          maxHeight: 56,
+          maxHeight: 64,
         },
         ButtonStyle,
       ]}
@@ -58,7 +58,7 @@ export const Button = React.memo((props: ButtonProps) => {
           <Text
             style={[
               {
-                ...textVariants.button_m_bold,
+                ...textVariants.button_l_poppins_bold,
                 color: disabled ? colors.grey_light : secondary ? colors.primary : colors.white,
               },
               LabelStyle,
@@ -69,6 +69,6 @@ export const Button = React.memo((props: ButtonProps) => {
           {rightItem ?? rightItem}
         </>
       )}
-    </Pressable>
+    </TouchableOpacity>
   );
 });

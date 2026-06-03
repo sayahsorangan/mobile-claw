@@ -1,24 +1,23 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 
-import {Animated, View} from 'react-native';
+import {Image} from 'react-native';
 
 import {Images} from '@app/assets/images';
 import {SCREEN_WIDTH} from '@app/constan/dimensions';
-import {useTheme} from '@app/themes';
+import {Box, useTheme} from '@app/themes';
 import {Container} from '@components/container';
+import {MascotText} from '@components/mascot-text';
+import {translate} from '@i18n';
 import {store} from '@redux-store/store';
 import {Navigation, navigationRef} from '@router/navigation-helper';
 
 const SplashScreen = () => {
-  const theme = useTheme();
-
-  const scale = useRef(new Animated.Value(0.3)).current;
-  const opacity = useRef(new Animated.Value(0)).current;
-  const rotate = useRef(new Animated.Value(0)).current;
+  const t = translate;
+  const {spacing} = useTheme();
 
   const navigate = () => {
     if (!navigationRef.isReady()) {
-      setTimeout(navigate, 1000);
+      setTimeout(navigate, 1500);
       return;
     }
     const {UserReducer} = store.getState();
@@ -26,37 +25,29 @@ const SplashScreen = () => {
     if (isAuthenticated) {
       Navigation.replace('tab', {screen: 'home'});
     } else {
-      Navigation.replace('login');
+      Navigation.replace('welcome');
     }
   };
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.spring(scale, {toValue: 1, useNativeDriver: true, speed: 4, bounciness: 14}),
-      Animated.timing(opacity, {toValue: 1, duration: 600, useNativeDriver: true}),
-      Animated.timing(rotate, {toValue: 1, duration: 800, useNativeDriver: true}),
-    ]).start(() => navigate());
-  }, []);
-
-  const spin = rotate.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['-10deg', '0deg'],
+    navigate();
   });
 
   return (
-    <Container translucent backgroundColor={theme.colors.white}>
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Animated.Image
-          source={Images.logo}
-          style={{
-            width: SCREEN_WIDTH / 2,
-            height: SCREEN_WIDTH / 2,
-            borderRadius: theme.borderRadii.round,
-            opacity,
-            transform: [{scale}, {rotate: spin}],
-          }}
-        />
-      </View>
+    <Container withBackgroundImage>
+      <Box flex={1} marginTop="xl">
+        <Box flexDirection="row">
+          <Image source={Images.germany_flag} style={{width: SCREEN_WIDTH * 0.4, height: SCREEN_WIDTH * 0.4}} />
+          <Image
+            source={Images.logo}
+            style={{width: SCREEN_WIDTH * 0.6 - spacing.md, height: SCREEN_WIDTH * 0.4}}
+            resizeMode="contain"
+          />
+        </Box>
+        <Box flex={1}>
+          <MascotText text={t('welcome.splashGreeting')} />
+        </Box>
+      </Box>
     </Container>
   );
 };

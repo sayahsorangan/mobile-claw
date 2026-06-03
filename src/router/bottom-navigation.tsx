@@ -115,7 +115,7 @@ const BottomTab = (props: any) => {
               <Text
                 style={{
                   marginTop: theme.spacing.xs,
-                  ...theme.textVariants.body_helper_bold,
+                  ...theme.textVariants.body_helper_poppins_bold,
                   fontWeight: '600',
                   color: isFocused ? theme.colors.primary : theme.colors.grey_light,
                 }}

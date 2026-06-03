@@ -1,18 +1,47 @@
 [
   {
-    "name": "bold",
-    "font": "Inter-Bold"
+    "name": "poppins_regular",
+    "font": "Poppins_500Medium",
+    "weight": "500"
   },
   {
-    "name": "medium",
-    "font": "Inter-Medium"
+    "name": "poppins_medium",
+    "font": "Poppins_600SemiBold",
+    "weight": "600"
   },
   {
-    "name": "regular",
-    "font": "Inter-Regular"
+    "name": "poppins_semibold",
+    "font": "Poppins_700Bold",
+    "weight": "700"
   },
   {
-    "name": "semibold",
-    "font": "Inter-SemiBold"
+    "name": "poppins_bold",
+    "font": "Poppins_800ExtraBold",
+    "weight": "800"
+  },
+  {
+    "name": "poppins_extrabold",
+    "font": "Poppins_900Black",
+    "weight": "900"
+  },
+  {
+    "name": "nunito_sans_regular",
+    "font": "NunitoSans_400Regular",
+    "weight": "400"
+  },
+  {
+    "name": "nunito_sans_semibold",
+    "font": "NunitoSans_600SemiBold",
+    "weight": "600"
+  },
+  {
+    "name": "nunito_sans_bold",
+    "font": "NunitoSans_700Bold",
+    "weight": "700"
+  },
+  {
+    "name": "nunito_sans_extrabold",
+    "font": "NunitoSans_800ExtraBold",
+    "weight": "800"
   }
 ]

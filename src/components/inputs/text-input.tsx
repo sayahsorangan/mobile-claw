@@ -23,6 +23,7 @@ interface TextInputProps extends TIP {
   onRightIconPress?: () => void;
   iconLeftName?: string;
   iconRightName?: string;
+  error?: string;
 }
 
 export const TextInput = React.memo(
@@ -39,6 +40,7 @@ export const TextInput = React.memo(
       iconLeftName,
       iconRightName,
       onRightIconPress,
+      error,
       ...other
     } = props;
 
@@ -47,7 +49,7 @@ export const TextInput = React.memo(
         {!!label && (
           <Text
             style={{
-              ...textVariants.body_medium,
+              ...textVariants.body_leading_poppins_medium,
               color: colors.black,
               marginBottom: spacing.xs,
             }}
@@ -58,13 +60,13 @@ export const TextInput = React.memo(
         <View
           style={[
             {
-              paddingHorizontal: spacing.xs,
+              paddingHorizontal: spacing.sm,
               flexDirection: 'row',
               alignItems: 'center',
-              borderWidth: 1,
-              height: 48,
-              borderRadius: borderRadii.xs,
+              height: 56,
+              borderRadius: borderRadii.md,
               borderColor: colors.grey_light,
+              backgroundColor: colors.white,
             },
             containerStyle,
           ]}
@@ -81,7 +83,7 @@ export const TextInput = React.memo(
                 value={value}
                 style={[
                   {
-                    ...textVariants.body_medium,
+                    ...textVariants.body_leading_poppins_medium,
                     color: colors.black,
                     padding: 0,
                   },
@@ -102,6 +104,11 @@ export const TextInput = React.memo(
             )}
           </View>
         </View>
+        {error && (
+          <Text variant="body_helper_poppins_regular" color="danger" marginTop="xxs">
+            * {error}
+          </Text>
+        )}
       </>
     );
   }),

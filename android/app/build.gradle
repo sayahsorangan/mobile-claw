@@ -81,7 +81,7 @@ android {
 
     namespace "com.template_s2t"
     defaultConfig {
-        applicationId "id.sandi.mobile.claw.app"
+        applicationId "id.aion.mobile.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         // Changes for CI/CD

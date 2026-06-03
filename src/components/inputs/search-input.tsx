@@ -56,7 +56,7 @@ export const SearchInput = React.memo((props: SearchInputProps) => {
           value={value}
           style={[
             {
-              ...textVariants.body_medium,
+              ...textVariants.body_poppins_medium,
               color: colors.grey_dark,
               padding: 0,
               flex: 1,

@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Mobile Claw App Dev</string>
+	<string>Aion Mobile Dev</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -52,10 +52,16 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Feather.ttf</string>
-		<string>Inter-Medium.ttf</string>
-		<string>Inter-Bold.ttf</string>
-		<string>Inter-Regular.ttf</string>
-		<string>Inter-SemiBold.ttf</string>
+		<string>NunitoSans_800ExtraBold.ttf</string>
+		<string>Poppins_600SemiBold.ttf</string>
+		<string>Poppins_700Bold.ttf</string>
+		<string>NunitoSans_700Bold.ttf</string>
+		<string>Poppins_800ExtraBold.ttf</string>
+		<string>Poppins_500Medium.ttf</string>
+		<string>NunitoSans_500Medium.ttf</string>
+		<string>NunitoSans_400Regular.ttf</string>
+		<string>NunitoSans_600SemiBold.ttf</string>
+		<string>Poppins_900Black.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

@@ -44,9 +44,9 @@ export const DropdrownInput = React.memo((props: DropdrownInputProps) => {
             style={{paddingTop: Platform.OS == 'ios' ? STATUSBAR_HEIGHT + spacing.md : spacing.md}}
           >
             <Box flex={1}>
-              <Text variant={'h_6_medium'}>{label}</Text>
+              <Text variant={'h_6_poppins_medium'}>{label}</Text>
             </Box>
-            <IconButton onPress={() => setOpen(false)} icon_size={24} icon_name="x" icon_color={colors.black} />
+            <IconButton onPress={() => setOpen(false)} iconSize={24} iconName="x" iconColor={colors.black} />
           </Box>
           <ScrollView>
             {items.map((item, index) => {
@@ -62,7 +62,7 @@ export const DropdrownInput = React.memo((props: DropdrownInputProps) => {
                     borderColor={'grey_light'}
                   >
                     <Box flex={1} marginRight={'xs'}>
-                      <Text variant={'body_medium'}>{item?.label}</Text>
+                      <Text variant={'body_poppins_medium'}>{item?.label}</Text>
                     </Box>
                     <Icons.Feather name="check" size={20} color={is_active ? colors.primary : colors.white} />
                   </Box>
@@ -73,14 +73,14 @@ export const DropdrownInput = React.memo((props: DropdrownInputProps) => {
         </Box>
       </Modal>
       {!!label && (
-        <Text variant={'body_helper_medium'} mb={'xs'}>
+        <Text variant={'body_helper_poppins_medium'} mb={'xs'}>
           {label}
         </Text>
       )}
       <IconButton
         onPress={() => setOpen(true)}
         LabelStyle={{
-          ...textVariants.body_medium,
+          ...textVariants.body_poppins_medium,
           color: colors.black,
           flex: 1,
         }}
@@ -99,10 +99,10 @@ export const DropdrownInput = React.memo((props: DropdrownInputProps) => {
             ? items.find(i => i.value == value[0])?.label
             : t('item_selected', {count: value?.length})
         }
-        icon_name={'chevron-down'}
-        icon_color={colors.primary}
-        icon_size={16}
-        left_icon={false}
+        iconName={'chevron-down'}
+        iconColor={colors.primary}
+        iconSize={16}
+        leftIcon={false}
       />
     </Box>
   );

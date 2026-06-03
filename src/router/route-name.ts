@@ -2,9 +2,11 @@ import {NavigatorScreenParams} from '@react-navigation/native';
 
 export const Route = {
   splash: 'splash',
-  login: 'login',
   tab: 'tab',
   home: 'home',
+  welcome: 'welcome',
+  login: 'login',
+  gamification: 'gamification',
 } as const;
 
 export interface IBottomTabScreen {
@@ -17,8 +19,10 @@ export interface IBottomTabScreen {
 
 export type StackScreens = {
   [Route.splash]: undefined;
-  [Route.login]: undefined;
   [Route.home]: undefined;
+  [Route.welcome]: undefined;
+  [Route.login]: undefined;
+  [Route.gamification]: undefined;
 };
 
 export type RouteStackNavigation = {

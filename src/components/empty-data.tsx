@@ -13,7 +13,7 @@ export const EmptyData = React.memo(({text}: {text?: string}) => {
   return (
     <View style={{justifyContent: 'center', alignItems: 'center', marginVertical: spacing.md, flex: 1}}>
       <Icons.Feather name="x-circle" color={colors.grey} size={56} />
-      <Text style={{...textVariants.body_regular, marginTop: spacing.xs, color: colors.black}}>
+      <Text style={{...textVariants.body_poppins_regular, marginTop: spacing.xs, color: colors.black}}>
         {text ? text : t('no_data_found')}
       </Text>
     </View>

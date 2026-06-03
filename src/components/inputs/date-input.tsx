@@ -52,12 +52,12 @@ export const DateInput = React.memo((props: DateInputProps) => {
           <Box backgroundColor="white" borderTopLeftRadius="lg" borderTopRightRadius="lg" padding="md">
             <Box flexDirection="row" justifyContent="space-between" alignItems="center" marginBottom="sm">
               <TouchableOpacity onPress={() => setShow(false)}>
-                <Text variant="body_regular" color="danger">
+                <Text variant="body_poppins_regular" color="danger">
                   Cancel
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={handleConfirm}>
-                <Text variant="body_semibold" color="primary">
+                <Text variant="body_poppins_semibold" color="primary">
                   Done
                 </Text>
               </TouchableOpacity>
@@ -74,14 +74,14 @@ export const DateInput = React.memo((props: DateInputProps) => {
       )}
 
       {!!label && (
-        <Text variant={'body_regular'} mb={'xs'}>
+        <Text variant={'body_poppins_regular'} mb={'xs'}>
           {label}
         </Text>
       )}
       <IconButton
         onPress={() => setShow(true)}
         LabelStyle={{
-          ...textVariants.body_regular,
+          ...textVariants.body_poppins_regular,
           color: colors.black,
           flex: 1,
         }}
@@ -94,10 +94,10 @@ export const DateInput = React.memo((props: DateInputProps) => {
           height: 48,
         }}
         label={type == 'date' ? moment(value).format('DD MMMM YYYY') : moment(value).format('hh:mm A')}
-        icon_name={type == 'date' ? 'calendar' : 'clock'}
-        icon_color={colors.primary}
-        icon_size={16}
-        left_icon={false}
+        iconName={type == 'date' ? 'calendar' : 'clock'}
+        iconColor={colors.primary}
+        iconSize={16}
+        leftIcon={false}
       />
     </Box>
   );

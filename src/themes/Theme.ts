@@ -16,7 +16,8 @@ interface IFont {
   includeFontPadding: boolean;
 }
 
-type FontWeight = 'medium' | 'regular' | 'bold' | 'semibold';
+type FontFamily = 'nunito_sans' | 'poppins';
+type FontWeight = 'regular' | 'medium' | 'semibold' | 'bold' | 'extrabold';
 type FontSizeKey =
   | 'h_1'
   | 'h_2'
@@ -32,24 +33,26 @@ type FontSizeKey =
   | 'button_l';
 
 type IFontSylesKey = Record<FontWeight, IFont>;
-type IFontSyles = Record<`${FontSizeKey}_${FontWeight}`, any> & {defaults: any};
+type IFontSyles = Record<`${FontSizeKey}_${FontFamily}_${FontWeight}`, any> & {defaults: any};
+
+const DEFAULT_FONT_NAME = 'poppins_regular';
 
 const generateFont = () => {
-  let data = {};
-  font.map(i => {
-    data = {
+  return font.reduce((data, item) => {
+    return {
       ...data,
-      [i.name]: {color: 'black', fontFamily: i.font, includeFontPadding: false},
+      [item.name]: {color: 'black', fontFamily: item.font, includeFontPadding: false, fontWeight: item.weight},
     };
-  });
-  return data as IFontSylesKey;
+  }, {}) as IFontSylesKey;
 };
 
 const generateStyle = () => {
   const texts = generateFont();
-  let data = {defaults: {...texts.regular, fontSize: font_size.body}};
-  Object.keys(font_size).map(s => {
-    Object.keys(texts).map(f => {
+  const defaultText = texts[DEFAULT_FONT_NAME] ?? Object.values(texts)[0];
+
+  let data = {defaults: {...defaultText, fontSize: font_size.body}};
+  Object.keys(font_size).forEach(s => {
+    Object.keys(texts).forEach(f => {
       data = {
         ...data,
         [s + '_' + f]: {...texts[f], fontSize: font_size[s] - 2},

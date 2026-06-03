@@ -31,15 +31,15 @@ const FallBack = (props: FallBackProps) => {
           <Feather name="alert-triangle" size={48} color={theme.colors.danger_dark} />
         </Box>
 
-        <Text variant="h_3_bold" color="black" marginBottom="xs" testID="display-error">
+        <Text variant="h_3_poppins_bold" color="black" marginBottom="xs" testID="display-error">
           {t('oops')}
         </Text>
 
-        <Text variant="h_6_semibold" color="grey_dark" marginBottom="xs">
+        <Text variant="h_6_poppins_semibold" color="grey_dark" marginBottom="xs">
           {t('error_occurred')}
         </Text>
 
-        <Text variant="body_regular" color="grey" textAlign="center" marginBottom="lg">
+        <Text variant="body_poppins_regular" color="grey" textAlign="center" marginBottom="lg">
           {t('error_unexpected')}
         </Text>
 
@@ -52,10 +52,10 @@ const FallBack = (props: FallBackProps) => {
           borderWidth={1}
           borderColor="warning"
         >
-          <Text variant="body_helper_semibold" color="warning_dark" marginBottom="xxs">
+          <Text variant="body_helper_poppins_semibold" color="warning_dark" marginBottom="xxs">
             {t('error_detail')}
           </Text>
-          <Text variant="body_helper_regular" color="grey_dark" numberOfLines={6}>
+          <Text variant="body_helper_poppins_regular" color="grey_dark" numberOfLines={6}>
             {props.error?.toString()}
           </Text>
         </Box>
@@ -76,7 +76,7 @@ const FallBack = (props: FallBackProps) => {
           onPress={props.onPress}
         >
           <Feather name="refresh-cw" size={18} color={theme.colors.white} />
-          <Text variant="button_m_semibold" color="white">
+          <Text variant="button_m_poppins_semibold" color="white">
             {t('try_again')}
           </Text>
         </Pressable>

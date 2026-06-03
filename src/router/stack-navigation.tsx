@@ -6,8 +6,10 @@ import {Icons} from '@app/assets/icons';
 import {Box, Text, theme} from '@app/themes';
 import {STATUSBAR_HEIGHT} from '@components/container';
 import {store} from '@redux-store/store';
-import LoginScreen from '@screens/auth/login-screen';
+import {LoginScreen} from '@screens/auth/login-screen';
+import {GamificationScreen} from '@screens/onboarding/screens/gamification-screen';
 import SplashScreen from '@screens/splash-screen';
+import {WelcomeScreen} from '@screens/welcome-screen';
 
 import {BottomTabScreen} from './bottom-navigation';
 import {Route, RouteStackNavigation} from './route-name';
@@ -25,7 +27,9 @@ export const StackNavigator = () => {
       initialRouteName={Route.splash}
     >
       <Stack.Screen name={Route.splash} component={SplashScreen} />
-      <Stack.Screen name={Route.login} component={LoginScreen} />
+      <Stack.Screen name={Route.welcome} component={WelcomeScreen} options={{animation: 'fade'}} />
+      <Stack.Screen name={Route.login} component={LoginScreen} options={{animation: 'fade'}} />
+      <Stack.Screen name={Route.gamification} component={GamificationScreen} options={{animation: 'fade'}} />
       <Stack.Screen name={Route.tab} component={BottomTabScreen} />
     </Stack.Navigator>
   );
@@ -54,7 +58,7 @@ const CustomHeader = (p: any) => {
         <Icons.Feather name="chevron-left" size={24} color={theme.colors.grey_dark} />
       </Pressable>
       <Box flex={1}>
-        <Text numberOfLines={1} variant={'h_6_medium'} marginHorizontal={'xs'}>
+        <Text numberOfLines={1} variant={'h_6_poppins_medium'} marginHorizontal={'xs'}>
           {p.options.title}
         </Text>
       </Box>

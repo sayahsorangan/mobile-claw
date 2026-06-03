@@ -11,17 +11,12 @@ import {dark_theme, theme} from '@app/themes';
 import {AppProvider} from '@components-organisms/provider';
 import {ErrorBoundary} from '@components/atoms/error-boundary';
 import i18n from '@i18n';
-import {runMigrations} from '@lib/db/migrations';
 import {MainNavigator} from '@router/main-navigation';
 import {ThemeProvider} from '@shopify/restyle';
 
 const App = () => {
   const themeMode = useAppSelector(state => state.AppReducer.themeMode);
   const language = useAppSelector(state => state.AppReducer.language);
-
-  useEffect(() => {
-    runMigrations();
-  }, []);
 
   useEffect(() => {
     moment.locale('en');

@@ -34,6 +34,7 @@ const moduleResolver = [
     ],
     alias: getPath(),
   },
+  'react-native-worklets/plugin',
 ];
 
 module.exports = function (api) {

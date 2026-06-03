@@ -36,7 +36,7 @@ export const Header = React.memo((props: HeaderProps) => {
         <Icons.Feather name="chevron-left" size={24} color={colors.grey_dark} />
       </Pressable>
       <View style={{flex: 1}}>
-        <Text numberOfLines={1} variant={'h_5_medium'} marginHorizontal={'xs'}>
+        <Text numberOfLines={1} variant={'h_5_poppins_medium'} marginHorizontal={'xs'}>
           {title}
         </Text>
       </View>

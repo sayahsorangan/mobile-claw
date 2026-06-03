@@ -1,220 +1,189 @@
-import React, {useRef, useState} from 'react';
+import React from 'react';
 
-import {Alert, Image, Pressable, TextInput as RNTextInput} from 'react-native';
+import {KeyboardAvoidingView, ScrollView, TextInput as RNTextInput} from 'react-native';
 
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {z} from 'zod/v3';
 
-import {Icons} from '@app/assets/icons';
-import {Images} from '@app/assets/images';
-import {SCREEN_WIDTH} from '@app/constan/dimensions';
-import {useAppDispatch} from '@app/hooks/redux';
+import {is_ios} from '@app/constan/app';
+import {SCREEN_HEIGHT} from '@app/constan/dimensions';
 import {Box, Text, useTheme} from '@app/themes';
-import {FadeInView} from '@components/animations';
-import {Button} from '@components/button/Button';
+import {Button} from '@components/button';
+import {IconButton} from '@components/button/icon-button';
 import {Container} from '@components/container';
-import {TextInput} from '@components/inputs/text-input';
-import {AuthQueries} from '@react-query/auth/hooks';
-import {user_action} from '@redux-store/slice/user';
+import {Divider} from '@components/divider';
+import {TextInput} from '@components/inputs';
+import {TKeys, translate} from '@i18n';
 import {Navigation} from '@router/navigation-helper';
 
-const SOCIAL_BUTTONS = [
-  {key: 'google', label: 'G', bg: '#FFFFFF', color: '#EA4335', borderColor: '#E0E0E0'},
-  {key: 'facebook', icon: 'facebook', bg: '#3B5998', color: '#FFFFFF'},
-  {key: 'twitter', icon: 'twitter', bg: '#7c858a', color: '#FFFFFF'},
-];
+type LoginForm = {
+  email: string;
+  password: string;
+};
+
+type LoginFormErrors = Partial<Record<keyof LoginForm, string>>;
 
 const LoginScreen = () => {
-  const {colors, spacing, borderRadii, textVariants} = useTheme();
-  const dispatch = useAppDispatch();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const passwordRef = useRef<RNTextInput>(null);
+  const t = translate;
+  const {spacing} = useTheme();
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [form, setForm] = React.useState<LoginForm>({email: '', password: ''});
+  const [errors, setErrors] = React.useState<LoginFormErrors>({});
+  const emailRef = React.useRef<RNTextInput | null>(null);
+  const passwordRef = React.useRef<RNTextInput | null>(null);
 
-  const loginMutation = AuthQueries.useSignIn({
-    onSuccess: data => {
-      dispatch(user_action.setUser(data as any));
-      dispatch(
-        user_action.setAuth({
-          accessToken: data as any,
-          refreshToken: data as any,
-          expiresIn: data as any,
-        }),
-      );
-      Navigation.reset({name: 'tab'});
-    },
-    onError: () => {
-      Alert.alert('Error', 'Invalid email or password');
-    },
-  });
+  const validationMessage = React.useMemo(
+    () => ({
+      emailInvalid: t('auth.login.emailInvalid'),
+      emailRequired: t('auth.login.emailRequired'),
+      passwordMinLength: t('auth.login.passwordMinLength'),
+      passwordRequired: t('auth.login.passwordRequired'),
+    }),
+    [t],
+  );
 
-  const validate = () => {
-    let valid = true;
-    if (!email.trim()) {
-      setEmailError('Email is required');
-      valid = false;
-    } else {
-      setEmailError('');
-    }
-    if (!password.trim()) {
-      setPasswordError('Password is required');
-      valid = false;
-    } else {
-      setPasswordError('');
-    }
-    return valid;
+  const loginSchema = React.useMemo(
+    () =>
+      z.object({
+        email: z.string().trim().min(1, validationMessage.emailRequired).email(validationMessage.emailInvalid),
+        password: z
+          .string()
+          .trim()
+          .min(1, validationMessage.passwordRequired)
+          .min(6, validationMessage.passwordMinLength),
+      }),
+    [validationMessage],
+  );
+
+  const emailSchema = React.useMemo(
+    () =>
+      z.object({
+        email: z.string().trim().min(1, validationMessage.emailRequired).email(validationMessage.emailInvalid),
+      }),
+    [validationMessage],
+  );
+
+  const setFieldValue = (field: keyof LoginForm, value: string) => {
+    setForm(previous => ({...previous, [field]: value}));
+    setErrors(previous => ({...previous, [field]: undefined}));
   };
 
-  const handleLogin = () => {
-    if (!validate()) {
+  const validateEmailOnly = React.useCallback(() => {
+    const parsed = emailSchema.safeParse({email: form.email});
+
+    if (!parsed.success) {
+      const emailIssue = parsed.error.issues.find(issue => issue.path[0] === 'email');
+
+      setErrors(previous => ({...previous, email: emailIssue?.message ?? validationMessage.emailInvalid}));
+      return false;
+    }
+
+    setErrors(previous => ({...previous, email: undefined}));
+    return true;
+  }, [emailSchema, form.email, validationMessage.emailInvalid]);
+
+  const onEmailSubmitEditing = () => {
+    const isEmailValid = validateEmailOnly();
+
+    if (isEmailValid) {
+      passwordRef.current?.focus();
+    }
+  };
+
+  const onSubmit = () => {
+    const parsed = loginSchema.safeParse(form);
+
+    if (!parsed.success) {
+      const nextErrors: LoginFormErrors = {};
+
+      parsed.error.issues.forEach(issue => {
+        const [path] = issue.path;
+
+        if ((path === 'email' || path === 'password') && !nextErrors[path]) {
+          nextErrors[path] = issue.message;
+        }
+      });
+
+      setErrors(nextErrors);
       return;
     }
-    loginMutation.mutate({email: email.trim(), password});
+
+    setErrors({});
   };
 
   return (
-    <Container>
-      <KeyboardAwareScrollView
-        contentContainerStyle={{flexGrow: 1, padding: spacing.md}}
-        keyboardShouldPersistTaps="handled"
+    <Container withBackgroundImage>
+      <KeyboardAvoidingView
+        behavior={is_ios ? 'padding' : undefined}
+        keyboardVerticalOffset={is_ios ? 54 : 0}
+        style={{flex: 1}}
       >
-        {/* Top image */}
-        <FadeInView delay={0} slideFrom="bottom" style={{height: '35%', marginBottom: spacing.lg}} slideDistance={30}>
-          <Box alignItems="flex-end" marginBottom="md" flex={1}>
-            <Image source={Images.signin} style={{width: SCREEN_WIDTH, height: '100%'}} resizeMode="contain" />
-          </Box>
-        </FadeInView>
-
-        {/* Title section */}
-        <FadeInView delay={100} slideFrom="bottom" slideDistance={30}>
-          <Box marginBottom="xs">
-            <Text variant="h_1_bold" color="black">
-              Let's get something
-            </Text>
-          </Box>
-          <Box marginBottom="lg">
-            <Text variant="body_regular" color="grey">
-              Good to see you back.
-            </Text>
-          </Box>
-        </FadeInView>
-
-        {/* Social login buttons */}
-        <FadeInView delay={200} slideFrom="bottom" slideDistance={25}>
-          <Box flexDirection="row" marginBottom="xl" gap="sm">
-            {SOCIAL_BUTTONS.map(item => (
-              <Pressable
-                key={item.key}
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: borderRadii.round,
-                  backgroundColor: item.bg,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderWidth: item.borderColor ? 1 : 0,
-                  borderColor: item.borderColor,
-                }}
-              >
-                {item.icon ? (
-                  <Icons.Feather name={item.icon} size={20} color={item.color} />
-                ) : (
-                  <Text style={{...textVariants.h_4_bold, color: item.color}}>{item.label}</Text>
-                )}
-              </Pressable>
-            ))}
-          </Box>
-        </FadeInView>
-
-        {/* Email input */}
-        <FadeInView delay={300} slideFrom="bottom" slideDistance={25}>
-          <Box marginBottom="md">
+        <IconButton
+          iconName="chevron-left"
+          ButtonStyle={{position: 'absolute', top: spacing.md, left: spacing.md, zIndex: 10000}}
+          onPress={() => Navigation.back()}
+        />
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            padding: spacing.md,
+            marginTop: SCREEN_HEIGHT * 0.2,
+            justifyContent: 'center',
+          }}
+        >
+          <Text textAlign={'center'} color={'primary_dark'} variant={'h_2_poppins_bold'}>
+            {t(TKeys['auth.login.title'])}
+          </Text>
+          <Text mt={'sm'} textAlign={'center'} color={'grey'} variant={'body_poppins_medium'}>
+            {t(TKeys['auth.login.subtitle'])}
+          </Text>
+          <Box marginVertical={'xl'}>
             <TextInput
-              placeholder="Email"
-              value={email}
-              onChangeText={(v: string) => {
-                setEmail(v);
-                if (emailError) {
-                  setEmailError('');
-                }
-              }}
+              ref={emailRef}
+              value={form.email}
+              label={t(TKeys['auth.login.emailLabel'])}
+              placeholder={t(TKeys['auth.login.emailPlaceholder'])}
+              returnKeyType="next"
+              blurOnSubmit={false}
               keyboardType="email-address"
               autoCapitalize="none"
-              iconLeftName="mail"
-              returnKeyType="next"
-              onSubmitEditing={() => passwordRef.current?.focus()}
+              autoCorrect={false}
+              onSubmitEditing={onEmailSubmitEditing}
+              onChangeText={value => setFieldValue('email', value)}
+              error={errors.email}
             />
-            {!!emailError && (
-              <Text variant="body_helper_regular" style={{color: colors.danger}} marginTop="xxs">
-                {emailError}
-              </Text>
-            )}
-          </Box>
-        </FadeInView>
-
-        {/* Password input */}
-        <FadeInView delay={400} slideFrom="bottom" slideDistance={25}>
-          <Box marginBottom="md">
+            <Divider vertical="lg" />
             <TextInput
               ref={passwordRef}
-              placeholder="Password"
-              value={password}
-              onChangeText={(v: string) => {
-                setPassword(v);
-                if (passwordError) {
-                  setPasswordError('');
-                }
-              }}
+              value={form.password}
+              label={t(TKeys['auth.login.passwordLabel'])}
+              placeholder={t(TKeys['auth.login.passwordPlaceholder'])}
               secureTextEntry={!showPassword}
-              iconLeftName="lock"
-              iconRightName={showPassword ? 'eye' : 'eye-off'}
+              iconRightName={showPassword ? 'eye-off' : 'eye'}
               onRightIconPress={() => setShowPassword(prev => !prev)}
-              returnKeyType="go"
-              onSubmitEditing={handleLogin}
+              onChangeText={value => setFieldValue('password', value)}
+              error={errors.password}
             />
-            {!!passwordError && (
-              <Text variant="body_helper_regular" style={{color: colors.danger}} marginTop="xxs">
-                {passwordError}
-              </Text>
-            )}
-          </Box>
-        </FadeInView>
-
-        {/* Sign In button */}
-        <FadeInView delay={600} slideFrom="bottom" slideDistance={20}>
-          <Box marginVertical="md">
-            <Button
-              label="Sign In"
-              onPress={handleLogin}
-              loading={loginMutation.isLoading}
-              disabled={loginMutation.isLoading}
-              ButtonStyle={{
-                backgroundColor: colors.primary_dark,
-                borderColor: colors.primary_dark,
-                borderRadius: borderRadii.xs,
-              }}
-            />
-          </Box>
-        </FadeInView>
-
-        {/* Sign up link */}
-        <FadeInView delay={700} slideFrom="bottom" slideDistance={15}>
-          <Box flexDirection="row" justifyContent="center" alignItems="center">
-            <Text variant="body_regular" color="grey">
-              Don't have account ?{'  '}
+            <Divider vertical="sm" />
+            <Text textAlign={'right'} color={'primary'} variant={'body_poppins_medium'}>
+              {t(TKeys['auth.login.forgotPassword'])}
             </Text>
-            <Pressable onPress={() => Navigation.navigate('home')}>
-              <Text variant="body_semibold" color="info">
-                Sign up
+            <Divider vertical="xl" />
+            <Button label={t(TKeys['auth.login.submit'])} onPress={onSubmit} />
+            <Divider vertical="md" />
+            <Text textAlign={'center'} color={'grey'} variant={'body_poppins_medium'}>
+              {t(TKeys['auth.login.signupPrompt'])}{' '}
+              <Text color={'primary'} variant={'body_poppins_medium'} onPress={() => {}}>
+                {t(TKeys['auth.login.signup'])}
               </Text>
-            </Pressable>
+            </Text>
           </Box>
-        </FadeInView>
-      </KeyboardAwareScrollView>
+          <Text textAlign={'center'} color={'grey'} variant={'body_helper_poppins_medium'}>
+            Version 1.0.0
+          </Text>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </Container>
   );
 };
 
-export default LoginScreen;
+export {LoginScreen};
