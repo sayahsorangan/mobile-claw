@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import {Icons} from '@app/assets/icons';
-import {Text, useTheme} from '@app/themes';
+import {Box, Text, useTheme} from '@app/themes';
 
 interface TextInputProps extends TIP {
   value?: string;
@@ -24,6 +24,7 @@ interface TextInputProps extends TIP {
   iconLeftName?: string;
   iconRightName?: string;
   error?: string;
+  maxLength?: number;
 }
 
 export const TextInput = React.memo(
@@ -41,21 +42,29 @@ export const TextInput = React.memo(
       iconRightName,
       onRightIconPress,
       error,
+      maxLength,
       ...other
     } = props;
 
     return (
       <>
         {!!label && (
-          <Text
-            style={{
-              ...textVariants.body_leading_poppins_medium,
-              color: colors.black,
-              marginBottom: spacing.xs,
-            }}
-          >
-            {label}
-          </Text>
+          <Box flexDirection="row" alignItems="flex-end" marginBottom="xs">
+            <Text
+              style={{
+                ...textVariants.body_leading_poppins_medium,
+                color: colors.black,
+                flex: 1,
+              }}
+            >
+              {label}
+            </Text>
+            {maxLength ? (
+              <Text variant={'body_helper_poppins_regular'} color={'grey'}>
+                {maxLength ? `${value?.length || 0}/${maxLength}` : ''}
+              </Text>
+            ) : null}
+          </Box>
         )}
         <View
           style={[
@@ -86,6 +95,7 @@ export const TextInput = React.memo(
                     ...textVariants.body_leading_poppins_medium,
                     color: colors.black,
                     padding: 0,
+                    flex: 1,
                   },
                   TextInputStyle,
                 ]}

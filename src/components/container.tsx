@@ -34,7 +34,7 @@ export const Container = React.memo((props: ContainerProps) => {
   const {colors, spacing} = useTheme();
   const {
     children,
-    backgroundColor = colors.white,
+    backgroundColor = colors.background,
     translucent = false,
     loading = false,
     containerProps,
@@ -54,7 +54,7 @@ export const Container = React.memo((props: ContainerProps) => {
   const handleImageLoad = () => {
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: 350,
+      duration: 250,
       useNativeDriver: true,
     }).start();
   };

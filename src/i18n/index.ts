@@ -20,17 +20,10 @@ i18n.use(initReactI18next).init({
     useSuspense: false,
   },
 });
-
-export const translate = i18n.t;
-
-export default i18n;
-
 type TranslationKey = keyof typeof resources.en.translation;
 
-export const TKeys = Object.keys(resources.en.translation).reduce((accumulator, key) => {
-  const translationKey = key as TranslationKey;
-  accumulator[translationKey] = translationKey;
-  return accumulator;
-}, {} as Record<TranslationKey, TranslationKey>);
+export const translate = (key: TranslationKey) => {
+  return i18n.t(key);
+};
 
-export type TKey = TranslationKey;
+export default i18n;

@@ -12,7 +12,7 @@ import {IconButton} from '@components/button/icon-button';
 import {Container} from '@components/container';
 import {Divider} from '@components/divider';
 import {TextInput} from '@components/inputs';
-import {TKeys, translate} from '@i18n';
+import {translate} from '@i18n';
 import {Navigation} from '@router/navigation-helper';
 
 type LoginForm = {
@@ -114,7 +114,7 @@ const LoginScreen = () => {
     <Container withBackgroundImage>
       <KeyboardAvoidingView
         behavior={is_ios ? 'padding' : undefined}
-        keyboardVerticalOffset={is_ios ? 54 : 0}
+        keyboardVerticalOffset={is_ios ? 40 : 0}
         style={{flex: 1}}
       >
         <IconButton
@@ -131,17 +131,17 @@ const LoginScreen = () => {
           }}
         >
           <Text textAlign={'center'} color={'primary_dark'} variant={'h_2_poppins_bold'}>
-            {t(TKeys['auth.login.title'])}
+            {t('auth.login.title')}
           </Text>
           <Text mt={'sm'} textAlign={'center'} color={'grey'} variant={'body_poppins_medium'}>
-            {t(TKeys['auth.login.subtitle'])}
+            {t('auth.login.subtitle')}
           </Text>
           <Box marginVertical={'xl'}>
             <TextInput
               ref={emailRef}
               value={form.email}
-              label={t(TKeys['auth.login.emailLabel'])}
-              placeholder={t(TKeys['auth.login.emailPlaceholder'])}
+              label={t('auth.login.emailLabel')}
+              placeholder={t('auth.login.emailPlaceholder')}
               returnKeyType="next"
               blurOnSubmit={false}
               keyboardType="email-address"
@@ -155,8 +155,8 @@ const LoginScreen = () => {
             <TextInput
               ref={passwordRef}
               value={form.password}
-              label={t(TKeys['auth.login.passwordLabel'])}
-              placeholder={t(TKeys['auth.login.passwordPlaceholder'])}
+              label={t('auth.login.passwordLabel')}
+              placeholder={t('auth.login.passwordPlaceholder')}
               secureTextEntry={!showPassword}
               iconRightName={showPassword ? 'eye-off' : 'eye'}
               onRightIconPress={() => setShowPassword(prev => !prev)}
@@ -165,15 +165,15 @@ const LoginScreen = () => {
             />
             <Divider vertical="sm" />
             <Text textAlign={'right'} color={'primary'} variant={'body_poppins_medium'}>
-              {t(TKeys['auth.login.forgotPassword'])}
+              {t('auth.login.forgotPassword')}
             </Text>
             <Divider vertical="xl" />
-            <Button label={t(TKeys['auth.login.submit'])} onPress={onSubmit} />
+            <Button label={t('auth.login.submit')} onPress={onSubmit} />
             <Divider vertical="md" />
             <Text textAlign={'center'} color={'grey'} variant={'body_poppins_medium'}>
-              {t(TKeys['auth.login.signupPrompt'])}{' '}
+              {t('auth.login.signupPrompt')}{' '}
               <Text color={'primary'} variant={'body_poppins_medium'} onPress={() => {}}>
-                {t(TKeys['auth.login.signup'])}
+                {t('auth.login.signup')}
               </Text>
             </Text>
           </Box>

@@ -7,6 +7,8 @@ export const Route = {
   welcome: 'welcome',
   login: 'login',
   gamification: 'gamification',
+  gamification_preparation: 'gamification_preparation',
+  topic: 'topic',
 } as const;
 
 export interface IBottomTabScreen {
@@ -23,6 +25,8 @@ export type StackScreens = {
   [Route.welcome]: undefined;
   [Route.login]: undefined;
   [Route.gamification]: undefined;
+  [Route.gamification_preparation]: undefined;
+  [Route.topic]: undefined;
 };
 
 export type RouteStackNavigation = {

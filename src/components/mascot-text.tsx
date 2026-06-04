@@ -41,15 +41,8 @@ export const MascotText = React.memo((props: MascotTextProps) => {
       <Animated.View
         style={{transform: [{translateY: mascotTranslateY}], justifyContent: 'center', alignItems: 'center'}}
       >
-        <Box
-          padding="lg"
-          backgroundColor={'primary'}
-          borderRadius={'lg'}
-          paddingVertical={'lg'}
-          marginHorizontal={'md'}
-          marginBottom={'md'}
-        >
-          <Text variant={'h_5_poppins_bold'} color={'white'} textAlign={'center'}>
+        <Box padding="lg" backgroundColor={'primary'} borderRadius={'lg'} marginHorizontal={'md'} marginBottom={'md'}>
+          <Text variant={'h_6_poppins_bold'} color={'white'} textAlign={'center'}>
             {props.text}
           </Text>
           <Box
@@ -67,7 +60,7 @@ export const MascotText = React.memo((props: MascotTextProps) => {
           loop
           resizeMode="contain"
           source={Lotties.main_mascot}
-          style={{width: SCREEN_WIDTH * 0.6, height: SCREEN_WIDTH * 0.6}}
+          style={{width: SCREEN_WIDTH * 0.5, height: SCREEN_WIDTH * 0.5}}
         />
       </Animated.View>
     </Box>

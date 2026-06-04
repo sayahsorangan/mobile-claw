@@ -7,7 +7,9 @@ import {Box, Text, theme} from '@app/themes';
 import {STATUSBAR_HEIGHT} from '@components/container';
 import {store} from '@redux-store/store';
 import {LoginScreen} from '@screens/auth/login-screen';
-import {GamificationScreen} from '@screens/onboarding/screens/gamification-screen';
+import {GamificationPreparationScreen} from '@screens/onboarding/screens/gamificaiton/gamification-preparation-screen';
+import {GamificationScreen} from '@screens/onboarding/screens/gamificaiton/gamification-screen';
+import {TopicScreen} from '@screens/onboarding/screens/topic/topic-screen';
 import SplashScreen from '@screens/splash-screen';
 import {WelcomeScreen} from '@screens/welcome-screen';
 
@@ -28,8 +30,15 @@ export const StackNavigator = () => {
     >
       <Stack.Screen name={Route.splash} component={SplashScreen} />
       <Stack.Screen name={Route.welcome} component={WelcomeScreen} options={{animation: 'fade'}} />
-      <Stack.Screen name={Route.login} component={LoginScreen} options={{animation: 'fade'}} />
+      <Stack.Screen name={Route.login} component={LoginScreen} />
       <Stack.Screen name={Route.gamification} component={GamificationScreen} options={{animation: 'fade'}} />
+      <Stack.Screen
+        name={Route.gamification_preparation}
+        component={GamificationPreparationScreen}
+        options={{animation: 'fade'}}
+      />
+      <Stack.Screen name={Route.topic} component={TopicScreen} options={{animation: 'fade'}} />
+
       <Stack.Screen name={Route.tab} component={BottomTabScreen} />
     </Stack.Navigator>
   );

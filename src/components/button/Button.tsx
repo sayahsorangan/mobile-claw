@@ -36,7 +36,7 @@ export const Button = React.memo((props: ButtonProps) => {
       onPress={onPress}
       style={[
         {
-          backgroundColor: disabled ? colors.grey : secondary ? colors.white : colors.primary,
+          backgroundColor: disabled ? colors.primary_light : secondary ? undefined : colors.primary,
           borderRadius: borderRadii.lg,
           height: 56,
           borderWidth: disabled ? 0 : 1,
@@ -59,7 +59,7 @@ export const Button = React.memo((props: ButtonProps) => {
             style={[
               {
                 ...textVariants.button_l_poppins_bold,
-                color: disabled ? colors.grey_light : secondary ? colors.primary : colors.white,
+                color: disabled ? colors.white : secondary ? colors.primary : colors.white,
               },
               LabelStyle,
             ]}

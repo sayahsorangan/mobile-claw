@@ -9,10 +9,11 @@ import {Button} from '@components/button';
 import {Container} from '@components/container';
 import {Divider} from '@components/divider';
 import {MascotText} from '@components/mascot-text';
-import {TKeys, translate} from '@i18n';
+import {translate} from '@i18n';
 import {Navigation} from '@router/navigation-helper';
+import {Route} from '@router/route-name';
 
-const GamificationScreen = () => {
+const GamificationPreparationScreen = () => {
   const t = translate;
   const {spacing} = useTheme();
 
@@ -29,18 +30,17 @@ const GamificationScreen = () => {
           source={Images.logo}
           style={{width: SCREEN_WIDTH * 0.4, height: SCREEN_WIDTH * 0.2, resizeMode: 'contain'}}
         />
-
         <Box flex={1} justifyContent={'center'} alignItems={'center'}>
-          <MascotText text={t(TKeys['onboarding.gamification.intro'])} />
+          <MascotText text={t('onboarding.gamificationPreparation.message')} />
         </Box>
         <Box flexDirection={'row'}>
-          <Button secondary label={t(TKeys.back)} onPress={() => Navigation.back()} />
+          <Button secondary label={t('back')} onPress={() => Navigation.back()} />
           <Divider horizontal="md" />
-          <Button label={t(TKeys.next)} />
+          <Button label={t('next')} onPress={() => Navigation.navigate(Route.topic)} />
         </Box>
       </ScrollView>
     </Container>
   );
 };
 
-export {GamificationScreen};
+export {GamificationPreparationScreen};
