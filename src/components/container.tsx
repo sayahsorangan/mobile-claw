@@ -1,19 +1,8 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 
-import {
-  ActivityIndicator,
-  Animated,
-  ImageBackground,
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  StatusBarProps,
-  View,
-  ViewProps,
-} from 'react-native';
+import {ActivityIndicator, Platform, SafeAreaView, StatusBar, StatusBarProps, View, ViewProps} from 'react-native';
 
-import {Images} from '@app/assets/images';
-import {SCREEN_HEIGHT, SCREEN_WIDTH} from '@app/constan/dimensions';
+import {SCREEN_WIDTH} from '@app/constan/dimensions';
 import {Text, useTheme} from '@app/themes';
 
 import {EmptyData} from './empty-data';
@@ -27,65 +16,31 @@ interface ContainerProps extends OwnStatusBarProps {
   containerProps?: ViewProps;
   is_empty?: boolean;
   loading_text?: string;
-  withBackgroundImage?: boolean;
 }
 
 export const Container = React.memo((props: ContainerProps) => {
   const {colors, spacing} = useTheme();
   const {
     children,
-    backgroundColor = colors.background,
+    backgroundColor = undefined,
     translucent = false,
     loading = false,
     containerProps,
     is_empty = false,
     loading_text,
-    withBackgroundImage = false,
     ...other
   } = props;
 
   const [isLoading, setIsLoading] = useState(loading);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     setIsLoading(loading);
   }, [loading]);
 
-  const handleImageLoad = () => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 250,
-      useNativeDriver: true,
-    }).start();
-  };
-
   return (
     <View style={{flex: 1}} {...containerProps}>
-      {withBackgroundImage && (
-        <Animated.View
-          style={{
-            width: SCREEN_WIDTH,
-            height: SCREEN_HEIGHT + STATUSBAR_HEIGHT,
-            zIndex: -1,
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            opacity: fadeAnim,
-          }}
-        >
-          <ImageBackground
-            source={Images.background}
-            style={{
-              width: SCREEN_WIDTH,
-              height: SCREEN_HEIGHT + STATUSBAR_HEIGHT,
-            }}
-            resizeMode="cover"
-            onLoad={handleImageLoad}
-          />
-        </Animated.View>
-      )}
-      <MyStatusBar backgroundColor={withBackgroundImage ? undefined : backgroundColor} {...{translucent}} {...other} />
-      <View style={{flex: 1, backgroundColor: withBackgroundImage ? undefined : backgroundColor, overflow: 'hidden'}}>
+      <MyStatusBar backgroundColor={backgroundColor} {...{translucent}} {...other} />
+      <View style={{flex: 1, backgroundColor, overflow: 'hidden'}}>
         {isLoading ? null : is_empty ? <EmptyData /> : children}
       </View>
       {isLoading && (

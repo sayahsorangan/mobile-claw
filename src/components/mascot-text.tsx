@@ -10,6 +10,7 @@ import {Box, Text} from '@app/themes';
 
 interface MascotTextProps {
   text?: string;
+  lottieAnimation?: string;
 }
 
 export const MascotText = React.memo((props: MascotTextProps) => {
@@ -59,7 +60,7 @@ export const MascotText = React.memo((props: MascotTextProps) => {
           autoPlay
           loop
           resizeMode="contain"
-          source={Lotties.main_mascot}
+          source={props.lottieAnimation ?? Lotties.main_mascot}
           style={{width: SCREEN_WIDTH * 0.5, height: SCREEN_WIDTH * 0.5}}
         />
       </Animated.View>

@@ -15,10 +15,10 @@ import {Route} from '@router/route-name';
 
 const GamificationScreen = () => {
   const t = translate;
-  const {spacing, colors} = useTheme();
+  const {spacing} = useTheme();
 
   return (
-    <Container backgroundColor={colors.background}>
+    <Container>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,

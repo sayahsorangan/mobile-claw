@@ -4,6 +4,7 @@ import {KeyboardAvoidingView, ScrollView} from 'react-native';
 
 import Toast from 'react-native-toast-message';
 
+import {Lotties} from '@app/assets/animations';
 import {is_ios} from '@app/constan/app';
 import {Box, Text, useTheme} from '@app/themes';
 import {Button} from '@components/button';
@@ -50,7 +51,10 @@ const TopicScreen = () => {
             </Box>
           </Box>
           <Box flex={1} justifyContent={'center'} alignItems={'center'}>
-            <MascotText text={t('onboarding.topicInput.messageTitle') + ' ' + t('onboarding.topicInput.messageBody')} />
+            <MascotText
+              lottieAnimation={Lotties.pointing_mascot}
+              text={t('onboarding.topicInput.messageTitle') + ' ' + t('onboarding.topicInput.messageBody')}
+            />
           </Box>
           <Box mb={'xl'}>
             <TextInput

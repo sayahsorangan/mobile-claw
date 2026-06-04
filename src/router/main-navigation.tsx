@@ -13,15 +13,17 @@ import {StackNavigator} from './stack-navigation';
 const ToastComponent = ({type, text1, text2}: {type: 'error' | 'success' | 'info'; text1?: string; text2?: string}) => {
   return (
     <Box
-      backgroundColor={type == 'error' ? 'danger_light' : type == 'success' ? 'success_light' : 'primary_light'}
+      backgroundColor={type == 'error' ? 'danger' : type == 'success' ? 'success' : 'primary'}
       marginTop={'md'}
       padding={'md'}
       paddingHorizontal={'lg'}
       maxWidth={SCREEN_WIDTH - 32}
       borderRadius={'md'}
     >
-      <Text variant={'body_leading_poppins_semibold'}>{text1}</Text>
-      <Text variant={'body_helper_poppins_regular'} mt={'xxs'}>
+      <Text color="white" variant={'body_leading_poppins_semibold'}>
+        {text1}
+      </Text>
+      <Text color="white" variant={'body_helper_poppins_regular'} mt={'xxs'}>
         {text2}
       </Text>
     </Box>

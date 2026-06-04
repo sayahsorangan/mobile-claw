@@ -17,7 +17,7 @@ const SplashScreen = () => {
 
   const navigate = () => {
     if (!navigationRef.isReady()) {
-      setTimeout(navigate, 1500);
+      setTimeout(navigate, 3000);
       return;
     }
     const {UserReducer} = store.getState();
@@ -34,7 +34,7 @@ const SplashScreen = () => {
   });
 
   return (
-    <Container withBackgroundImage>
+    <Container>
       <Box flex={1} marginTop="xl">
         <Box flexDirection="row">
           <Image source={Images.germany_flag} style={{width: SCREEN_WIDTH * 0.4, height: SCREEN_WIDTH * 0.4}} />

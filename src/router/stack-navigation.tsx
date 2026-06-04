@@ -25,19 +25,18 @@ export const StackNavigator = () => {
       screenOptions={{
         headerShown: false,
         header: p => CustomHeader(p),
+        contentStyle: {
+          backgroundColor: 'transparent',
+        },
       }}
       initialRouteName={Route.splash}
     >
       <Stack.Screen name={Route.splash} component={SplashScreen} />
-      <Stack.Screen name={Route.welcome} component={WelcomeScreen} options={{animation: 'fade'}} />
+      <Stack.Screen name={Route.welcome} component={WelcomeScreen} />
       <Stack.Screen name={Route.login} component={LoginScreen} />
-      <Stack.Screen name={Route.gamification} component={GamificationScreen} options={{animation: 'fade'}} />
-      <Stack.Screen
-        name={Route.gamification_preparation}
-        component={GamificationPreparationScreen}
-        options={{animation: 'fade'}}
-      />
-      <Stack.Screen name={Route.topic} component={TopicScreen} options={{animation: 'fade'}} />
+      <Stack.Screen name={Route.gamification} component={GamificationScreen} />
+      <Stack.Screen name={Route.gamification_preparation} component={GamificationPreparationScreen} />
+      <Stack.Screen name={Route.topic} component={TopicScreen} />
 
       <Stack.Screen name={Route.tab} component={BottomTabScreen} />
     </Stack.Navigator>
