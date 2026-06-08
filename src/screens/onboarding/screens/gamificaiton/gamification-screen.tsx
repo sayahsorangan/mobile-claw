@@ -1,13 +1,12 @@
 import React from 'react';
 
-import {Image, ScrollView} from 'react-native';
+import {ScrollView} from 'react-native';
 
-import {Images} from '@app/assets/images';
-import {SCREEN_WIDTH} from '@app/constan/dimensions';
+import {Lotties} from '@app/assets/animations';
 import {Box, useTheme} from '@app/themes';
 import {Button} from '@components/button';
+import {IconButton} from '@components/button/icon-button';
 import {Container} from '@components/container';
-import {Divider} from '@components/divider';
 import {MascotText} from '@components/mascot-text';
 import {translate} from '@i18n';
 import {Navigation} from '@router/navigation-helper';
@@ -18,7 +17,7 @@ const GamificationScreen = () => {
   const {spacing} = useTheme();
 
   return (
-    <Container>
+    <Container withBackgroundImage>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -26,18 +25,14 @@ const GamificationScreen = () => {
           paddingBottom: spacing.xl,
         }}
       >
-        <Image
-          source={Images.logo}
-          style={{width: SCREEN_WIDTH * 0.4, height: SCREEN_WIDTH * 0.2, resizeMode: 'contain'}}
-        />
+        <IconButton iconName="chevron-left" ButtonStyle={{alignSelf: 'flex-start'}} onPress={() => Navigation.back()} />
         <Box flex={1} justifyContent={'center'} alignItems={'center'}>
-          <MascotText text={t('onboarding.gamification.intro')} />
+          <MascotText lottieAnimation={Lotties.main_mascot} text={t('onboarding.gamification.intro')} />
         </Box>
-        <Box flexDirection={'row'}>
-          <Button secondary label={t('back')} onPress={() => Navigation.back()} />
-          <Divider horizontal="md" />
-          <Button label={t('next')} onPress={() => Navigation.navigate(Route.gamification_preparation)} />
-        </Box>
+        <Button
+          label={t('onboarding.gamification.next')}
+          onPress={() => Navigation.navigate(Route.gamification_preparation)}
+        />
       </ScrollView>
     </Container>
   );

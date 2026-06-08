@@ -34,7 +34,7 @@ const SplashScreen = () => {
   });
 
   return (
-    <Container>
+    <Container backgroundColor={'transparent'}>
       <Box flex={1} marginTop="xl">
         <Box flexDirection="row">
           <Image source={Images.germany_flag} style={{width: SCREEN_WIDTH * 0.4, height: SCREEN_WIDTH * 0.4}} />

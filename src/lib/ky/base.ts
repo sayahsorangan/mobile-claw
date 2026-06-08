@@ -7,6 +7,8 @@ import {authAfterResponseHooks, authBeforeResponseHooks} from './hooks';
 const kyInstance = ky.create({
   headers: {
     'cache-control': 'no-cache',
+    accept: 'application/vnd.hui+json; version=1',
+    'content-type': 'application/json',
   },
 });
 

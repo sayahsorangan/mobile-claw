@@ -5,4 +5,6 @@ export const storeKey = {
   Rag: 'Rag',
   Memory: 'Memory',
   Notification: 'Notification',
+  Onboarding: 'Onboarding',
+  Diagnostic: 'Diagnostic',
 };

@@ -44,7 +44,7 @@ export const Button = React.memo((props: ButtonProps) => {
           justifyContent: 'center',
           alignItems: 'center',
           flex: 1,
-          maxHeight: 64,
+          maxHeight: 56,
         },
         ButtonStyle,
       ]}

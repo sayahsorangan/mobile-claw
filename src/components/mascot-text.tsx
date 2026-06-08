@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {Animated} from 'react-native';
 
@@ -11,10 +11,28 @@ import {Box, Text} from '@app/themes';
 interface MascotTextProps {
   text?: string;
   lottieAnimation?: string;
+  streamText?: boolean;
 }
 
 export const MascotText = React.memo((props: MascotTextProps) => {
   const mascotTranslateY = useRef(new Animated.Value(0)).current;
+  const [displayedText, setDisplayedText] = useState(() => (props.streamText ? '' : props.text ?? ''));
+
+  useEffect(() => {
+    if (!props.streamText) {
+      setDisplayedText(props.text ?? '');
+      return;
+    }
+    setDisplayedText('');
+    const full = props.text ?? '';
+    let index = 0;
+    const interval = setInterval(() => {
+      index += 1;
+      setDisplayedText(full.slice(0, index));
+      if (index >= full.length) clearInterval(interval);
+    }, 40);
+    return () => clearInterval(interval);
+  }, [props.text, props.streamText]);
 
   useEffect(() => {
     const animation = Animated.loop(
@@ -44,7 +62,7 @@ export const MascotText = React.memo((props: MascotTextProps) => {
       >
         <Box padding="lg" backgroundColor={'primary'} borderRadius={'lg'} marginHorizontal={'md'} marginBottom={'md'}>
           <Text variant={'h_6_poppins_bold'} color={'white'} textAlign={'center'}>
-            {props.text}
+            {displayedText}
           </Text>
           <Box
             position={'absolute'}

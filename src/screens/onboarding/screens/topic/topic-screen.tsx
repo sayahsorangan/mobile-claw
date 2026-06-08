@@ -1,27 +1,57 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import {KeyboardAvoidingView, ScrollView} from 'react-native';
 
-import Toast from 'react-native-toast-message';
-
 import {Lotties} from '@app/assets/animations';
 import {is_ios} from '@app/constan/app';
+import {useAppDispatch} from '@app/hooks/redux';
 import {Box, Text, useTheme} from '@app/themes';
 import {Button} from '@components/button';
 import {Container} from '@components/container';
-import {Divider} from '@components/divider';
 import {TextInput} from '@components/inputs';
 import {MascotText} from '@components/mascot-text';
+import {StepProgressHeader} from '@components/step-progress-header';
 import {translate} from '@i18n';
+import {onboarding_action} from '@lib/redux/slice/onboarding';
+import {OnboardingQueries} from '@react-query/onboarding';
 import {Navigation} from '@router/navigation-helper';
+import {Route} from '@router/route-name';
 
 const TopicScreen = () => {
   const t = translate;
   const {spacing} = useTheme();
-  const [topic, setTopic] = React.useState('');
+  const dispatch = useAppDispatch();
+
+  const [topic, setTopic] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const {mutateAsync: startSession, isPending: isSubmitting} = OnboardingQueries.useStartOnboardingSession();
+
+  const handleTopicChange = (value: string) => {
+    if (errorMessage) {
+      setErrorMessage(null);
+    }
+    setTopic(value);
+  };
+
+  const handleContinue = async () => {
+    const trimmed = topic.trim();
+    if (!trimmed || isSubmitting) {
+      return;
+    }
+    try {
+      setErrorMessage(null);
+      const sessionId = await startSession();
+      dispatch(onboarding_action.setOnboardingSessionId(sessionId));
+      dispatch(onboarding_action.setTopicIntentAndResetDependents(trimmed));
+      Navigation.navigate(Route.competency_selection);
+    } catch (error: any) {
+      setErrorMessage(error?.message ?? 'Something went wrong');
+    }
+  };
 
   return (
-    <Container>
+    <Container withBackgroundImage>
       <KeyboardAvoidingView
         behavior={is_ios ? 'padding' : undefined}
         keyboardVerticalOffset={is_ios ? 40 : 0}
@@ -34,35 +64,31 @@ const TopicScreen = () => {
             paddingBottom: spacing.xl,
           }}
         >
-          <Box flexDirection={'row'}>
-            <Box flex={1}>
-              <Text variant={'h_2_poppins_extrabold'}>{t('onboarding.topicInput.screenHeadline')}</Text>
-              <Text variant={'h_2_poppins_extrabold'} color={'primary'}>
-                {t('onboarding.topicInput.screenHeadlineAccent')}
-              </Text>
-              <Text mt={'sm'} color={'grey'} variant={'body_poppins_regular'}>
-                {t('onboarding.topicInput.screenSubtitle')}
-              </Text>
-            </Box>
-            <Box backgroundColor="white" padding={'sm'} alignSelf={'flex-start'} borderRadius={'lg'}>
-              <Text variant={'h_6_poppins_extrabold'} color="primary">
-                1<Text variant={'body_helper_poppins_regular'}>/6</Text>
-              </Text>
-            </Box>
-          </Box>
+          <StepProgressHeader currentStep={1} maxStep={8} />
+          <Text variant={'h_4_poppins_bold'}>
+            {t('onboarding.topicInput.screenHeadline')}{' '}
+            <Text variant={'h_4_poppins_bold'} color={'primary'}>
+              {t('onboarding.topicInput.screenHeadlineAccent')}
+            </Text>
+          </Text>
+
+          <Text mt={'sm'} color={'grey'} variant={'body_poppins_regular'}>
+            {t('onboarding.topicInput.screenSubtitle')}
+          </Text>
+
           <Box flex={1} justifyContent={'center'} alignItems={'center'}>
             <MascotText
               lottieAnimation={Lotties.pointing_mascot}
               text={t('onboarding.topicInput.messageTitle') + ' ' + t('onboarding.topicInput.messageBody')}
             />
           </Box>
-          <Box mb={'xl'}>
+          <Box mb={'lg'}>
             <TextInput
               label={t('onboarding.topicInput.label')}
               placeholder={t('onboarding.topicInput.placeholder')}
-              iconRightName={topic?.length > 0 ? 'x' : 'search'}
-              onRightIconPress={() => topic?.length > 0 && setTopic('')}
-              onChangeText={setTopic}
+              iconRightName={topic.length > 0 ? 'x' : 'search'}
+              onRightIconPress={() => topic.length > 0 && handleTopicChange('')}
+              onChangeText={handleTopicChange}
               value={topic}
               maxLength={200}
             />
@@ -77,15 +103,21 @@ const TopicScreen = () => {
               <Text variant={'body_helper_poppins_regular'}>{t('onboarding.topicInput.helperPill')}</Text>
             </Box>
           </Box>
-          <Box flexDirection={'row'}>
-            <Button secondary label={t('back')} onPress={() => Navigation.back()} />
-            <Divider horizontal="md" />
-            <Button
-              label={t('next')}
-              disabled={topic?.length == 0}
-              onPress={() => Toast.show({type: 'error', text1: 'Error', text2: 'Unknown error occurred'})}
-            />
-          </Box>
+
+          {errorMessage ? (
+            <Box mb={'md'}>
+              <Text variant={'body_helper_poppins_regular'} color={'danger'} textAlign={'center'}>
+                {errorMessage}
+              </Text>
+            </Box>
+          ) : null}
+
+          <Button
+            label={t('onboarding.topicInput.next')}
+            disabled={topic.trim().length === 0}
+            loading={isSubmitting}
+            onPress={handleContinue}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </Container>
