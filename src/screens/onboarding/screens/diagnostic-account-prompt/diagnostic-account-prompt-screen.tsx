@@ -54,7 +54,7 @@ const DiagnosticAccountPromptScreen = () => {
           <Divider horizontal="md" />
           <Button
             label={t('onboarding.diagnosticAccountPrompt.cta')}
-            onPress={() => Navigation.navigate(Route.account_intro)}
+            onPress={() => Navigation.navigate(Route.pricing_access)}
           />
         </Box>
       </ScrollView>

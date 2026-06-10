@@ -29,7 +29,7 @@ const DiagnosticIntroductionScreen = () => {
 
   const handleNext = () => {
     dispatch(diagnostic_action.resetDiagnostic());
-    Navigation.navigate(Route.diagnostic_preparation);
+    Navigation.navigate(Route.diagnostic_case);
   };
 
   return (

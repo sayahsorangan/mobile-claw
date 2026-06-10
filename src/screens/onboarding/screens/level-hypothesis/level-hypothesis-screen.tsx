@@ -56,7 +56,7 @@ const LevelHypothesisScreen = () => {
           <Divider horizontal="md" />
           <Button
             label={t('onboarding.levelHypothesis.next')}
-            onPress={() => Navigation.navigate(Route.goal_motivation)}
+            onPress={() => Navigation.navigate(Route.diagnostic_preparation)}
           />
         </Box>
       </ScrollView>

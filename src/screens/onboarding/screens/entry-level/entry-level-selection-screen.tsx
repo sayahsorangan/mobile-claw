@@ -30,9 +30,9 @@ const EntryLevelSelectionScreen = () => {
       return;
     }
     if (selectedEntryLevelId === 'diagnostic') {
-      Navigation.navigate(Route.diagnostic_lead_in);
+      Navigation.navigate(Route.level_hypothesis);
     } else {
-      Navigation.navigate(Route.source_identification);
+      Navigation.navigate(Route.pricing_access);
     }
   };
 

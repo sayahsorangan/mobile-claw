@@ -15,6 +15,22 @@ import {Navigation} from '@router/navigation-helper';
 import {Route} from '@router/route-name';
 import {goalMotivationOptions} from '@screens/onboarding/data/goal-motivation-options';
 
+type Phase = 'transition' | 'experience' | 'list';
+
+const TRANSITION_DURATION_MS = 4000;
+const EXPERIENCE_DURATION_MS = 5000;
+
+const EXPERIENCE_MASCOT_MESSAGES: Record<string, string> = {
+  'no-prior-knowledge': 'onboarding.mascotReaction.responses.noPriorKnowledge',
+  'heard-about-it': 'onboarding.mascotReaction.responses.heardAboutIt',
+  'know-basics': 'onboarding.mascotReaction.responses.knowBasics',
+  'practical-experience': 'onboarding.mascotReaction.responses.practicalExperience',
+  'worked-several-times': 'onboarding.mascotReaction.responses.workedSeveralTimes',
+  'very-familiar': 'onboarding.mascotReaction.responses.veryFamiliar',
+  'higher-level-directly': 'onboarding.mascotReaction.responses.higherLevelDirectly',
+  'no-practical-experience': 'onboarding.mascotReaction.responses.noPracticalExperience',
+};
+
 const GoalMotivationScreen = () => {
   const t = translate;
   const {spacing, colors, borderRadii} = useTheme();
@@ -24,7 +40,6 @@ const GoalMotivationScreen = () => {
   const selectedSubtopicId = useAppSelector(state => state.OnboardingReducer.selectedSubtopicId);
   const subtopicOptions = useAppSelector(state => state.OnboardingReducer.subtopicOptions);
   const topicIntent = useAppSelector(state => state.OnboardingReducer.topicIntent);
-
   const selectedExperienceId = useAppSelector(state => state.OnboardingReducer.selectedExperienceId);
 
   const selectedSubtopic = subtopicOptions.find(item => item.id === selectedSubtopicId);
@@ -32,41 +47,36 @@ const GoalMotivationScreen = () => {
     selectedSubtopic?.labels[language] ?? (topicIntent.trim() || t('onboarding.goalMotivation.fallbackTopic'));
   const question = `${t('onboarding.goalMotivation.questionPrefix')} ${selectedTopicLabel}?`;
 
-  const EXPERIENCE_MASCOT_MESSAGES: Record<string, string> = {
-    'no-prior-knowledge': t('onboarding.mascotReaction.responses.noPriorKnowledge'),
-    'heard-about-it': t('onboarding.mascotReaction.responses.heardAboutIt'),
-    'know-basics': t('onboarding.mascotReaction.responses.knowBasics'),
-    'practical-experience': t('onboarding.mascotReaction.responses.practicalExperience'),
-    'worked-several-times': t('onboarding.mascotReaction.responses.workedSeveralTimes'),
-    'very-familiar': t('onboarding.mascotReaction.responses.veryFamiliar'),
-    'higher-level-directly': t('onboarding.mascotReaction.responses.higherLevelDirectly'),
-    'no-practical-experience': t('onboarding.mascotReaction.responses.noPracticalExperience'),
-  };
+  const experienceMessageKey =
+    selectedExperienceId && EXPERIENCE_MASCOT_MESSAGES[selectedExperienceId]
+      ? EXPERIENCE_MASCOT_MESSAGES[selectedExperienceId]
+      : 'onboarding.mascotReaction.responses.fallback';
 
-  const mascotMessage =
-    (selectedExperienceId && EXPERIENCE_MASCOT_MESSAGES[selectedExperienceId]) ??
-    t('onboarding.mascotReaction.responses.fallback');
-
-  const [showList, setShowList] = useState(false);
+  const [phase, setPhase] = useState<Phase>('transition');
   const mascotOpacity = useRef(new Animated.Value(1)).current;
   const listOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      Animated.timing(mascotOpacity, {
-        toValue: 0,
-        duration: 400,
-        useNativeDriver: true,
-      }).start(() => {
-        setShowList(true);
-        Animated.timing(listOpacity, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }).start();
+    // Phase 1: show transition message, then cross-fade to experience reaction
+    const t1 = setTimeout(() => {
+      Animated.timing(mascotOpacity, {toValue: 0, duration: 500, useNativeDriver: true}).start(() => {
+        setPhase('experience');
+        Animated.timing(mascotOpacity, {toValue: 1, duration: 500, useNativeDriver: true}).start();
       });
-    }, 4000);
-    return () => clearTimeout(timer);
+    }, TRANSITION_DURATION_MS);
+
+    // Phase 2: show experience reaction, then fade to options list
+    const t2 = setTimeout(() => {
+      Animated.timing(mascotOpacity, {toValue: 0, duration: 500, useNativeDriver: true}).start(() => {
+        setPhase('list');
+        Animated.timing(listOpacity, {toValue: 1, duration: 200, useNativeDriver: true}).start();
+      });
+    }, TRANSITION_DURATION_MS + EXPERIENCE_DURATION_MS);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [mascotOpacity, listOpacity]);
 
   const handleToggle = (id: string) => {
@@ -78,13 +88,21 @@ const GoalMotivationScreen = () => {
       <Box flex={1} padding={'md'}>
         <StepProgressHeader currentStep={6} maxStep={8} />
 
-        {!showList && (
+        {phase !== 'list' && (
           <Animated.View style={{flex: 1, opacity: mascotOpacity}}>
-            <MascotText lottieAnimation={Lotties.main_mascot} text={mascotMessage} streamText />
+            {phase === 'transition' ? (
+              <MascotText lottieAnimation={Lotties.main_mascot} text={t(experienceMessageKey as any)} streamText />
+            ) : (
+              <MascotText
+                lottieAnimation={Lotties.main_mascot}
+                text={t('onboarding.transitionMotivation.message')}
+                streamText
+              />
+            )}
           </Animated.View>
         )}
 
-        {showList && (
+        {phase === 'list' && (
           <Animated.View style={{flex: 1, opacity: listOpacity}}>
             <ScrollView
               contentContainerStyle={{flexGrow: 1, paddingBottom: spacing.xl}}

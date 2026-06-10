@@ -15,11 +15,10 @@ export const Route = {
   entry_level_selection: 'entry_level_selection',
   source_identification: 'source_identification',
   learning_experience: 'learning_experience',
-  mascot_reaction: 'mascot_reaction',
   level_hypothesis: 'level_hypothesis',
   goal_motivation: 'goal_motivation',
-  motivation_reaction: 'motivation_reaction',
   time_commitment: 'time_commitment',
+  language_selection: 'language_selection',
   outcome_preview: 'outcome_preview',
   pricing_access: 'pricing_access',
   diagnostic_lead_in: 'diagnostic_lead_in',
@@ -61,11 +60,10 @@ export type StackScreens = {
   [Route.entry_level_selection]: undefined;
   [Route.source_identification]: undefined;
   [Route.learning_experience]: undefined;
-  [Route.mascot_reaction]: undefined;
   [Route.level_hypothesis]: undefined;
   [Route.goal_motivation]: undefined;
-  [Route.motivation_reaction]: undefined;
   [Route.time_commitment]: undefined;
+  [Route.language_selection]: undefined;
   [Route.outcome_preview]: undefined;
   [Route.pricing_access]: undefined;
   [Route.diagnostic_lead_in]: undefined;

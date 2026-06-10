@@ -20,7 +20,7 @@ const DiagnosticPreparationScreen = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      Navigation.navigate(Route.diagnostic_case);
+      Navigation.navigate(Route.language_selection);
     }, DIAGNOSTIC_PREPARATION_DELAY_MS);
     return () => clearTimeout(timer);
   }, []);

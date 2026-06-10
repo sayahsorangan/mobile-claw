@@ -26,6 +26,10 @@ const OutcomePreviewScreen = () => {
     selectedTimeCommitmentId,
   });
 
+  const onPressCard = (cardId: string) => {
+    Navigation.navigate(Route.entry_level_selection);
+  };
+
   return (
     <Container>
       <ScrollView
@@ -41,15 +45,11 @@ const OutcomePreviewScreen = () => {
           {t('onboarding.outcomePreview.question')}
         </Text>
 
-        <Box gap={'md'} mb={'xl'}>
+        <Box gap={'md'} mb={'xl'} flex={1}>
           {cards.map(card => (
-            <TouchableOpacity
-              key={card.id}
-              onPress={() => {
-                Navigation.navigate(Route.pricing_access);
-              }}
-            >
+            <TouchableOpacity key={card.id} onPress={() => onPressCard(card.id)}>
               <Box
+                key={card.id}
                 padding={'md'}
                 borderRadius={'md'}
                 backgroundColor={'white'}

@@ -22,6 +22,8 @@ import {LearningExperienceScreen} from '@screens/onboarding/screens/experience/l
 import {GamificationPreparationScreen} from '@screens/onboarding/screens/gamificaiton/gamification-preparation-screen';
 import {GamificationScreen} from '@screens/onboarding/screens/gamificaiton/gamification-screen';
 import {GoalMotivationScreen} from '@screens/onboarding/screens/goal/goal-motivation-screen';
+import {LanguageSelectionScreen} from '@screens/onboarding/screens/language-selection/language-selection-screen';
+import {LevelHypothesisScreen} from '@screens/onboarding/screens/level-hypothesis/level-hypothesis-screen';
 import {OutcomePreviewScreen} from '@screens/onboarding/screens/outcome/outcome-preview-screen';
 import {PremiumBonusScreen} from '@screens/onboarding/screens/premium-bonus/premium-bonus-screen';
 import {PremiumDetailScreen} from '@screens/onboarding/screens/premium-detail/premium-detail-screen';
@@ -76,13 +78,6 @@ export const StackNavigator = () => {
       />
       <Stack.Screen name={Route.subtopic_selection} component={SubtopicSelectionScreen} options={{animation: 'fade'}} />
 
-      {/* Onboarding: Entry level branching */}
-      <Stack.Screen
-        name={Route.entry_level_selection}
-        component={EntryLevelSelectionScreen}
-        options={{animation: 'fade'}}
-      />
-
       {/* Onboarding: Core profiling flow */}
       <Stack.Screen
         name={Route.source_identification}
@@ -97,18 +92,33 @@ export const StackNavigator = () => {
       <Stack.Screen name={Route.goal_motivation} component={GoalMotivationScreen} options={{animation: 'fade'}} />
       <Stack.Screen name={Route.time_commitment} component={TimeCommitmentScreen} options={{animation: 'fade'}} />
       <Stack.Screen name={Route.outcome_preview} component={OutcomePreviewScreen} options={{animation: 'fade'}} />
-      <Stack.Screen name={Route.pricing_access} component={PricingAccessScreen} options={{animation: 'fade'}} />
+
+      {/* Onboarding: Entry level branching */}
+      <Stack.Screen
+        name={Route.entry_level_selection}
+        component={EntryLevelSelectionScreen}
+        options={{animation: 'fade'}}
+      />
+
+      {/* Onboarding: Level hypothesis + diagnostic preparation */}
+      <Stack.Screen name={Route.level_hypothesis} component={LevelHypothesisScreen} options={{animation: 'fade'}} />
+      <Stack.Screen
+        name={Route.diagnostic_preparation}
+        component={DiagnosticPreparationScreen}
+        options={{animation: 'fade'}}
+      />
+      <Stack.Screen name={Route.language_selection} component={LanguageSelectionScreen} options={{animation: 'fade'}} />
 
       {/* Onboarding: Diagnostic flow */}
       <Stack.Screen name={Route.diagnostic_lead_in} component={DiagnosticLeadInScreen} />
       <Stack.Screen name={Route.diagnostic_introduction} component={DiagnosticIntroductionScreen} />
-      <Stack.Screen name={Route.diagnostic_preparation} component={DiagnosticPreparationScreen} />
       <Stack.Screen name={Route.diagnostic_case} component={DiagnosticCaseScreen} />
       <Stack.Screen name={Route.diagnostic_case_transition} component={DiagnosticCaseTransitionScreen} />
       <Stack.Screen name={Route.diagnostic_completion} component={DiagnosticCompletionScreen} />
       <Stack.Screen name={Route.diagnostic_account_prompt} component={DiagnosticAccountPromptScreen} />
 
-      {/* Onboarding: Account/registration */}
+      {/* Onboarding: Pricing + account creation */}
+      <Stack.Screen name={Route.pricing_access} component={PricingAccessScreen} options={{animation: 'fade'}} />
       <Stack.Screen name={Route.account_intro} component={AccountIntroScreen} />
       <Stack.Screen name={Route.choose_registration} component={ChooseRegistrationScreen} />
 

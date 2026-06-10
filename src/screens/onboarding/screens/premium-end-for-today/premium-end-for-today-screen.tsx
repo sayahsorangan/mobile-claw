@@ -24,7 +24,7 @@ const PremiumEndForTodayScreen = () => {
           paddingBottom: spacing.xl,
         }}
       >
-        <Button secondary label={t('back')} onPress={() => Navigation.back()} style={{alignSelf: 'flex-start'}} />
+        <Button secondary label={t('back')} onPress={() => Navigation.back()} />
 
         <Text variant={'h_4_poppins_bold'} color={'primary_dark'} mt={'lg'} mb={'xs'}>
           {t('onboarding.premiumEndForToday.headline')}

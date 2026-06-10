@@ -56,8 +56,8 @@ const SourceIdentificationScreen = () => {
         {!showList && (
           <Animated.View style={{flex: 1, opacity: mascotOpacity}}>
             <MascotText
-              lottieAnimation={Lotties.main_mascot}
-              text={t('onboarding.transitionMotivation.message')}
+              lottieAnimation={Lotties.pointing_mascot}
+              text={t('onboarding.sourceIdentification.question')}
               streamText
             />
           </Animated.View>
@@ -117,7 +117,7 @@ const SourceIdentificationScreen = () => {
 
               <Button
                 label={t('onboarding.sourceIdentification.next')}
-                disabled={selectedSourceIds.length === 0}
+                disabled={false}
                 onPress={() => Navigation.navigate(Route.learning_experience)}
               />
             </ScrollView>
